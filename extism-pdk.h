@@ -20,11 +20,11 @@ extern void extism_error_set(uint64_t);
 IMPORT("env", "extism_config_get")
 extern uint64_t extism_config_get(uint64_t);
 
-IMPORT("env", "extism_kv_get")
-extern uint64_t extism_kv_get(uint64_t);
+IMPORT("env", "extism_var_get")
+extern uint64_t extism_var_get(uint64_t);
 
-IMPORT("env", "extism_kv_set")
-extern void extism_kv_set(uint64_t, uint64_t);
+IMPORT("env", "extism_var_set")
+extern void extism_var_set(uint64_t, uint64_t);
 
 IMPORT("env", "extism_store_u8")
 extern void extism_store_u8(uint64_t, uint8_t);
@@ -44,11 +44,8 @@ extern void extism_store_u64(uint64_t, uint64_t);
 IMPORT("env", "extism_load_u64")
 extern uint64_t extism_load_u64(uint64_t);
 
-IMPORT("env", "extism_file_read")
-extern uint64_t extism_file_read(int32_t);
-
-IMPORT("env", "extism_file_write")
-extern void extism_file_write(int32_t, uint64_t);
+IMPORT("env", "extism_http_request")
+extern uint64_t extism_http_request(uint64_t, uint64_t);
 
 static void extism_load(uint64_t offs, uint8_t *buffer, size_t length) {
   uint64_t n;
