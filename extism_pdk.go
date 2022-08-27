@@ -5,6 +5,7 @@ import (
 )
 
 /*
+#cgo CFLAGS: -w
 #include "extism-pdk.h"
 */
 import "C"
