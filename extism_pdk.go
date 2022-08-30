@@ -2,6 +2,7 @@ package pdk
 
 import (
 	"encoding/binary"
+	"runtime"
 )
 
 /*
@@ -14,13 +15,20 @@ type Host struct {
 	input []byte
 }
 
-type Memory struct {
+type memory struct {
 	offset uint64
 	length uint64
 }
 
 type Variables struct {
 	host *Host
+}
+
+func newMemory(offset, length uint64) memory {
+	mem := memory{offset, length}
+	runtime.SetFinalizer(&mem, mem.free)
+
+	return mem
 }
 
 func load(offset uint64, buf []byte) {
@@ -62,27 +70,26 @@ func NewHost() Host {
 	return Host{input}
 }
 
-func (h *Host) Allocate(length int) Memory {
+func (h *Host) Allocate(length int) memory {
 	clength := C.uint64_t(length)
 	offset := C.extism_alloc(clength)
 
-	return Memory{
-		offset: uint64(offset),
-		length: uint64(clength),
-	}
+	return newMemory(
+		uint64(offset),
+		uint64(clength),
+	)
 }
 
-func (h *Host) AllocateBytes(data []byte) Memory {
+func (h *Host) AllocateBytes(data []byte) memory {
 	clength := C.uint64_t(len(data))
 	offset := C.extism_alloc(clength)
 
 	store(offset, data)
 
-	return Memory{
-		offset: uint64(offset),
-		length: uint64(clength),
-	}
-
+	return newMemory(
+		uint64(offset),
+		uint64(clength),
+	)
 }
 
 func (h *Host) Input() []byte {
@@ -153,14 +160,14 @@ func (v *Variables) Remove(key string) {
 	)
 }
 
-func (m *Memory) Load(buffer []byte) {
+func (m *memory) load(buffer []byte) {
 	load(m.offset, buffer)
 }
 
-func (m *Memory) Store(data []byte) {
+func (m *memory) store(data []byte) {
 	store(m.offset, data)
 }
 
-func (m *Memory) Free() {
+func (m *memory) free() {
 	C.extism_free(m.offset)
 }
