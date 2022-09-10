@@ -36,6 +36,23 @@ func load(offset uint64, buf []byte) {
 	}
 }
 
+func loadInput() []byte {
+	length := int(C.extism_input_length())
+	buf := make([]byte, length)
+
+	for i := 0; i < length; i++ {
+		if length-i >= 8 {
+			x := C.extism_input_load_u64(uint64(i))
+			binary.LittleEndian.PutUint64(buf[i:i+8], x)
+			i += 7
+			continue
+		}
+		buf[i] = byte(C.extism_input_load_u8(uint64(i)))
+	}
+
+	return buf
+}
+
 func store(offset uint64, buf []byte) {
 	length := len(buf)
 
@@ -52,12 +69,7 @@ func store(offset uint64, buf []byte) {
 }
 
 func NewHost() Host {
-	inputOffset := C.extism_input_offset()
-	inputLength := C.extism_length(inputOffset)
-	input := make([]byte, int(inputLength))
-
-	load(inputOffset, input)
-
+	input := loadInput()
 	return Host{input}
 }
 
