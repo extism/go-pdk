@@ -51,6 +51,15 @@ extern uint64_t extism_load_u64(uint64_t);
 IMPORT("env", "extism_http_request")
 extern uint64_t extism_http_request(uint64_t, uint64_t);
 
+IMPORT("env", "extism_log_info")
+extern void extism_log_info(uint64_t);
+IMPORT("env", "extism_log_debug")
+extern void extism_log_debug(uint64_t);
+IMPORT("env", "extism_log_warn")
+extern void extism_log_warn(uint64_t);
+IMPORT("env", "extism_log_error")
+extern void extism_log_error(uint64_t);
+
 static void extism_load(uint64_t offs, uint8_t *buffer, uint64_t length) {
   uint64_t n;
   uint64_t left = 0;

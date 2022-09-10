@@ -22,6 +22,15 @@ type Variables struct {
 	host *Host
 }
 
+type LogLevel int
+
+const (
+	LogInfo LogLevel = iota
+	LogDebug
+	LogWarn
+	LogError
+)
+
 func load(offset uint64, buf []byte) {
 	length := len(buf)
 
@@ -96,12 +105,20 @@ func (h *Host) AllocateBytes(data []byte) Memory {
 
 }
 
+func (h *Host) AllocateString(data string) Memory {
+	return h.AllocateBytes([]byte(data))
+}
+
 func (h *Host) Input() []byte {
 	return h.input
 }
 
 func (h *Host) InputString() string {
 	return string(h.input)
+}
+
+func (h *Host) OutputMemory(mem Memory) {
+	C.extism_output_set(mem.offset, mem.length)
 }
 
 func (h *Host) Output(data []byte) {
@@ -125,6 +142,24 @@ func (h *Host) Config(key string) string {
 	load(offset, value)
 
 	return string(value)
+}
+
+func (h *Host) LogMemory(level LogLevel, memory Memory) {
+	switch level {
+	case LogInfo:
+		C.extism_log_info(memory.offset)
+	case LogDebug:
+		C.extism_log_debug(memory.offset)
+	case LogWarn:
+		C.extism_log_warn(memory.offset)
+	case LogError:
+		C.extism_log_error(memory.offset)
+	}
+}
+
+func (h *Host) Log(level LogLevel, s string) {
+	mem := h.AllocateString(s)
+	h.LogMemory(level, mem)
 }
 
 func (h *Host) Vars() *Variables {
