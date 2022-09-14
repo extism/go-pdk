@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/extism/go-pdk"
-	// "github.com/vugu/vjson"
 )
 
 //export count_vowels
