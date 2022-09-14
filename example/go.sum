@@ -1,4 +1,2 @@
 github.com/extism/go-pdk v0.0.0-20220910220145-f385a5f19d1d h1:nwr+atxLObICflh2BGTC7SKqln218aa+zKg9Yn9JMSM=
 github.com/extism/go-pdk v0.0.0-20220910220145-f385a5f19d1d/go.mod h1:rfOf4Z9uXtA4W3SYoPN34poctHYSo6ScSqcKoAswHjM=
-github.com/vugu/vjson v0.0.0-20200505061711-f9cbed27d3d9 h1:0cwYt2uGUAwxOYF6zAkVvCKWt8zOV3JhQqjvwKb6jf0=
-github.com/vugu/vjson v0.0.0-20200505061711-f9cbed27d3d9/go.mod h1:z7mAqSUjRDMQ09NIO18jG2llXMHLnUHlZ3/8MEMyBPA=
