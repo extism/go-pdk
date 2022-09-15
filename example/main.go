@@ -22,7 +22,9 @@ func count_vowels() int32 {
 
 	// test some extra pdk functionality
 	vars := host.Vars()
-	vars.Set("a", []byte("this is var a"))
+	if vars.Get("a") == nil {
+		vars.Set("a", []byte("this is var a"))
+	}
 	varA := vars.Get("a")
 	thing := host.Config("thing")
 
