@@ -1,3 +1,4 @@
+.PHONY: example
 example:
 	tinygo build -o example/example.wasm -target wasi example/main.go
 

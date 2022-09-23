@@ -129,19 +129,19 @@ func (h *Host) Output(data []byte) {
 	C.extism_output_set(offset, clength)
 }
 
-func (h *Host) Config(key string) string {
+func (h *Host) Config(key string) (string, bool) {
 	mem := h.AllocateBytes([]byte(key))
 
 	offset := C.extism_config_get(C.uint64_t(mem.offset))
 	clength := C.extism_length(offset)
 	if offset == 0 || clength == 0 {
-		return ""
+		return "", false
 	}
 
 	value := make([]byte, uint64(clength))
 	load(offset, value)
 
-	return string(value)
+	return string(value), true
 }
 
 func (h *Host) LogMemory(level LogLevel, memory Memory) {
@@ -209,4 +209,12 @@ func (m *Memory) Store(data []byte) {
 
 func (m *Memory) Free() {
 	C.extism_free(m.offset)
+}
+
+func (m *Memory) Length() uint64 {
+	return m.length
+}
+
+func (m *Memory) Offset() uint64 {
+	return m.offset
 }

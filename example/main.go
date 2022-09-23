@@ -26,9 +26,9 @@ func count_vowels() int32 {
 		vars.Set("a", []byte("this is var a"))
 	}
 	varA := vars.Get("a")
-	thing := host.Config("thing")
+	thing, ok := host.Config("thing")
 
-	if thing == "" {
+	if !ok {
 		thing = "<unset by host>"
 	}
 
