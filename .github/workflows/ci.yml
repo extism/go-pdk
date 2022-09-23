@@ -7,9 +7,17 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+        rust:
+          - stable
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          override: true
 
       - name: Install Go
         uses: actions/setup-go@v3
@@ -44,7 +52,7 @@ jobs:
           pip3 install .
           popd
 
-          extism install latest
+          extism install git
 
       - name: Compile example
         run: |
