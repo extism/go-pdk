@@ -9,17 +9,9 @@ import (
 */
 import "C"
 
-type Host struct {
-	input []byte
-}
-
 type Memory struct {
 	offset uint64
 	length uint64
-}
-
-type Variables struct {
-	host *Host
 }
 
 type LogLevel int
@@ -77,12 +69,11 @@ func store(offset uint64, buf []byte) {
 	}
 }
 
-func NewHost() Host {
-	input := loadInput()
-	return Host{input}
+func Input() []byte {
+	return loadInput()
 }
 
-func (h *Host) Allocate(length int) Memory {
+func Allocate(length int) Memory {
 	clength := C.uint64_t(length)
 	offset := C.extism_alloc(clength)
 
@@ -92,7 +83,7 @@ func (h *Host) Allocate(length int) Memory {
 	}
 }
 
-func (h *Host) AllocateBytes(data []byte) Memory {
+func AllocateBytes(data []byte) Memory {
 	clength := C.uint64_t(len(data))
 	offset := C.extism_alloc(clength)
 
@@ -105,23 +96,19 @@ func (h *Host) AllocateBytes(data []byte) Memory {
 
 }
 
-func (h *Host) AllocateString(data string) Memory {
-	return h.AllocateBytes([]byte(data))
+func AllocateString(data string) Memory {
+	return AllocateBytes([]byte(data))
 }
 
-func (h *Host) Input() []byte {
-	return h.input
+func InputString() string {
+	return string(Input())
 }
 
-func (h *Host) InputString() string {
-	return string(h.input)
-}
-
-func (h *Host) OutputMemory(mem Memory) {
+func OutputMemory(mem Memory) {
 	C.extism_output_set(mem.offset, mem.length)
 }
 
-func (h *Host) Output(data []byte) {
+func Output(data []byte) {
 	clength := C.uint64_t(len(data))
 	offset := C.extism_alloc(clength)
 
@@ -129,8 +116,8 @@ func (h *Host) Output(data []byte) {
 	C.extism_output_set(offset, clength)
 }
 
-func (h *Host) Config(key string) (string, bool) {
-	mem := h.AllocateBytes([]byte(key))
+func GetConfig(key string) (string, bool) {
+	mem := AllocateBytes([]byte(key))
 
 	offset := C.extism_config_get(C.uint64_t(mem.offset))
 	clength := C.extism_length(offset)
@@ -144,7 +131,7 @@ func (h *Host) Config(key string) (string, bool) {
 	return string(value), true
 }
 
-func (h *Host) LogMemory(level LogLevel, memory Memory) {
+func LogMemory(level LogLevel, memory Memory) {
 	switch level {
 	case LogInfo:
 		C.extism_log_info(memory.offset)
@@ -157,17 +144,13 @@ func (h *Host) LogMemory(level LogLevel, memory Memory) {
 	}
 }
 
-func (h *Host) Log(level LogLevel, s string) {
-	mem := h.AllocateString(s)
-	h.LogMemory(level, mem)
+func Log(level LogLevel, s string) {
+	mem := AllocateString(s)
+	LogMemory(level, mem)
 }
 
-func (h *Host) Vars() *Variables {
-	return &Variables{host: h}
-}
-
-func (v *Variables) Get(key string) []byte {
-	mem := v.host.AllocateBytes([]byte(key))
+func GetVar(key string) []byte {
+	mem := AllocateBytes([]byte(key))
 
 	offset := C.extism_var_get(C.uint64_t(mem.offset))
 	clength := C.extism_length(offset)
@@ -181,9 +164,9 @@ func (v *Variables) Get(key string) []byte {
 	return value
 }
 
-func (v *Variables) Set(key string, value []byte) {
-	keyMem := v.host.AllocateBytes([]byte(key))
-	valMem := v.host.AllocateBytes(value)
+func SetVar(key string, value []byte) {
+	keyMem := AllocateBytes([]byte(key))
+	valMem := AllocateBytes(value)
 
 	C.extism_var_set(
 		C.uint64_t(keyMem.offset),
@@ -191,8 +174,8 @@ func (v *Variables) Set(key string, value []byte) {
 	)
 }
 
-func (v *Variables) Remove(key string) {
-	mem := v.host.AllocateBytes([]byte(key))
+func RemoveVar(key string) {
+	mem := AllocateBytes([]byte(key))
 	C.extism_var_set(
 		C.uint64_t(mem.offset),
 		0,

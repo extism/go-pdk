@@ -36,12 +36,6 @@ extern void extism_store_u8(uint64_t, uint8_t);
 IMPORT("env", "extism_load_u8")
 extern uint8_t extism_load_u8(uint64_t);
 
-IMPORT("env", "extism_store_u32")
-extern void extism_store_u32(uint64_t, uint32_t);
-
-IMPORT("env", "extism_load_u32")
-extern uint32_t extism_load_u32(uint64_t);
-
 IMPORT("env", "extism_store_u64")
 extern void extism_store_u64(uint64_t, uint64_t);
 
