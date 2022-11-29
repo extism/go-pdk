@@ -56,7 +56,10 @@ jobs:
 
       - name: Compile example
         run: |
+          pushd example
           go mod download
+          popd 
+        
           make -B example
 
       - name: Test example
