@@ -119,7 +119,7 @@ func Output(data []byte) {
 	C.extism_output_set(offset, clength)
 }
 
-func Outputstring(s string) {
+func OutputString(s string) {
 	Output([]byte(s))
 }
 
