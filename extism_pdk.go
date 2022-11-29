@@ -2,6 +2,9 @@ package pdk
 
 import (
 	"encoding/binary"
+	"strings"
+
+	"github.com/valyala/fastjson"
 )
 
 /*
@@ -180,6 +183,81 @@ func RemoveVar(key string) {
 		C.uint64_t(mem.offset),
 		0,
 	)
+}
+
+type HTTPRequest struct {
+	url    string
+	header map[string]string
+	method string
+	body   []byte
+}
+
+type HTTPResponse struct {
+	body   []byte
+	status uint16
+}
+
+func (r HTTPResponse) Body() []byte {
+	return r.body
+}
+
+func (r HTTPResponse) Status() uint16 {
+	return r.status
+}
+
+func NewHTTPRequest(method string, url string) *HTTPRequest {
+	return &HTTPRequest{url: url, header: nil, method: strings.ToUpper(method), body: nil}
+}
+
+func (r *HTTPRequest) SetHeader(key string, value string) *HTTPRequest {
+	if r.header == nil {
+		r.header = map[string]string{}
+	}
+	r.header[key] = value
+	return r
+}
+
+func (r *HTTPRequest) SetBody(body []byte) *HTTPRequest {
+	r.body = body
+	return r
+}
+
+func (r *HTTPRequest) Send() HTTPResponse {
+	arena := &fastjson.Arena{}
+	json := arena.NewObject()
+	headers := arena.NewObject()
+	if r.header != nil {
+		for k, v := range r.header {
+			headers.Set(k, arena.NewString(v))
+		}
+
+		json.Set("header", headers)
+	}
+	json.Set("url", arena.NewString(r.url))
+	json.Set("method", arena.NewString(r.method))
+
+	var buf []byte
+	enc := json.MarshalTo(buf)
+
+	req := AllocateBytes(enc)
+	defer req.Free()
+	data := AllocateBytes(r.body)
+	defer data.Free()
+
+	offset := C.extism_http_request(C.uint64_t(req.offset), data.offset)
+	length := uint64(C.extism_length(offset))
+	status := uint16(C.extism_http_status_code())
+
+	memory := Memory{offset, length}
+	defer memory.Free()
+
+	var body []byte
+	memory.Load(body)
+
+	return HTTPResponse{
+		body,
+		status,
+	}
 }
 
 func (m *Memory) Load(buffer []byte) {
