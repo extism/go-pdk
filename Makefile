@@ -6,4 +6,4 @@ example:
 test:
 	extism call example/example.wasm count_vowels --wasi --input "this is a test" --set-config '{"thing": "1234"}'	
 	@echo ""
-	extism call example/http.wasm http_get --wasi
+	extism call example/http.wasm http_get --wasi --log-level info

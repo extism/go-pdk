@@ -9,8 +9,8 @@ func http_get() int32 {
 	req := pdk.NewHTTPRequest("GET", "https://jsonplaceholder.typicode.com/todos/1")
 	req.SetHeader("some-name", "some-value")
 	req.SetHeader("another", "again")
-	output := req.Send().Body()
-	pdk.OutputMemory(pdk.AllocateString(string(output)))
+	output := req.Send().Memory()
+	pdk.OutputMemory(output)
 
 	return 0
 }

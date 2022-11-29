@@ -119,6 +119,10 @@ func Output(data []byte) {
 	C.extism_output_set(offset, clength)
 }
 
+func Outputstring(s string) {
+	Output([]byte(s))
+}
+
 func GetConfig(key string) (string, bool) {
 	mem := AllocateBytes([]byte(key))
 
@@ -193,12 +197,18 @@ type HTTPRequest struct {
 }
 
 type HTTPResponse struct {
-	body   []byte
+	memory Memory
 	status uint16
 }
 
+func (r HTTPResponse) Memory() Memory {
+	return r.memory
+}
+
 func (r HTTPResponse) Body() []byte {
-	return r.body
+	buf := make([]byte, r.memory.length)
+	r.memory.Load(buf)
+	return buf
 }
 
 func (r HTTPResponse) Status() uint16 {
@@ -251,11 +261,8 @@ func (r *HTTPRequest) Send() HTTPResponse {
 	memory := Memory{offset, length}
 	defer memory.Free()
 
-	var body []byte
-	memory.Load(body)
-
 	return HTTPResponse{
-		body,
+		memory,
 		status,
 	}
 }
