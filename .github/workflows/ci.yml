@@ -56,6 +56,10 @@ jobs:
 
       - name: Compile example
         run: |
+          pushd example
+          go mod download
+          popd 
+        
           make -B example
 
       - name: Test example
@@ -66,3 +70,5 @@ jobs:
           echo $TEST | grep '"count": 4'
           echo $TEST | grep '"config": "1"'
           echo $TEST | grep '"a": "this is var a"'
+        
+          extism call example/http.wasm --wasi http_get | grep '"userId": 1'
