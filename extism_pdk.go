@@ -196,10 +196,10 @@ func RemoveVar(key string) {
 }
 
 type HTTPRequest struct {
-	url    string
-	header map[string]string
-	method string
-	body   []byte
+	url     string
+	headers map[string]string
+	method  string
+	body    []byte
 }
 
 type HTTPResponse struct {
@@ -222,14 +222,14 @@ func (r HTTPResponse) Status() uint16 {
 }
 
 func NewHTTPRequest(method string, url string) *HTTPRequest {
-	return &HTTPRequest{url: url, header: nil, method: strings.ToUpper(method), body: nil}
+	return &HTTPRequest{url: url, headers: nil, method: strings.ToUpper(method), body: nil}
 }
 
 func (r *HTTPRequest) SetHeader(key string, value string) *HTTPRequest {
-	if r.header == nil {
-		r.header = map[string]string{}
+	if r.headers == nil {
+		r.headers = map[string]string{}
 	}
-	r.header[key] = value
+	r.headers[key] = value
 	return r
 }
 
@@ -242,8 +242,8 @@ func (r *HTTPRequest) Send() HTTPResponse {
 	arena := &fastjson.Arena{}
 	json := arena.NewObject()
 	headers := arena.NewObject()
-	if r.header != nil {
-		for k, v := range r.header {
+	if r.headers != nil {
+		for k, v := range r.headers {
 			headers.Set(k, arena.NewString(v))
 		}
 
