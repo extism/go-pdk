@@ -286,3 +286,8 @@ func (m *Memory) Length() uint64 {
 func (m *Memory) Offset() uint64 {
 	return m.offset
 }
+
+func FindMemory(offset uint64) Memory {
+	length := uint64(C.extism_length(offset))
+	return Memory{offset, length}
+}
