@@ -2,9 +2,9 @@ package pdk
 
 import (
 	"encoding/binary"
+	"encoding/json"
+	"github.com/extism/go-pdk/internal/models"
 	"strings"
-
-	"github.com/valyala/fastjson"
 )
 
 /*
@@ -233,21 +233,13 @@ func (r *HTTPRequest) SetBody(body []byte) *HTTPRequest {
 }
 
 func (r *HTTPRequest) Send() HTTPResponse {
-	arena := &fastjson.Arena{}
-	json := arena.NewObject()
-	headers := arena.NewObject()
-	if r.header != nil {
-		for k, v := range r.header {
-			headers.Set(k, arena.NewString(v))
-		}
-
-		json.Set("header", headers)
+	meta := models.MetaData{
+		Url:     r.url,
+		Method:  r.method,
+		Headers: r.header,
 	}
-	json.Set("url", arena.NewString(r.url))
-	json.Set("method", arena.NewString(r.method))
 
-	var buf []byte
-	enc := json.MarshalTo(buf)
+	enc, _ := json.Marshal(meta)
 
 	req := AllocateBytes(enc)
 	defer req.Free()
