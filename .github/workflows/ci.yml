@@ -28,7 +28,7 @@ jobs:
       - name: Install TinyGo
         uses: acifani/setup-tinygo@v1.1.0
         with:
-          tinygo-version: 0.25.0
+          tinygo-version: 0.28.1
           binaryen-version: "110"
 
       - name: Setup Python env
