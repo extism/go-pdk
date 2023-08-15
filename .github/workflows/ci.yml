@@ -72,4 +72,4 @@ jobs:
           echo $TEST | grep '"config": "1"'
           echo $TEST | grep '"a": "this is var a"'
         
-          extism call example/http.wasm --wasi http_get | grep '"userId": 1'
+          extism call example/http.wasm --wasi http_get --allow-host "jsonplaceholder.typicode.com" | grep '"userId": 1'
