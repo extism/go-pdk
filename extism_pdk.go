@@ -265,7 +265,6 @@ func (r *HTTPRequest) Send() HTTPResponse {
 	status := uint16(C.extism_http_status_code())
 
 	memory := Memory{offset, length}
-	defer memory.Free()
 
 	return HTTPResponse{
 		memory,
