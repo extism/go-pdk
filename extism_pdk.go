@@ -125,6 +125,7 @@ func OutputString(s string) {
 
 func GetConfig(key string) (string, bool) {
 	mem := AllocateBytes([]byte(key))
+	defer mem.Free()
 
 	offset := C.extism_config_get(C.uint64_t(mem.offset))
 	clength := C.extism_length(offset)
@@ -153,6 +154,8 @@ func LogMemory(level LogLevel, memory Memory) {
 
 func Log(level LogLevel, s string) {
 	mem := AllocateString(s)
+	defer mem.Free()
+
 	LogMemory(level, mem)
 }
 
@@ -173,7 +176,10 @@ func GetVar(key string) []byte {
 
 func SetVar(key string, value []byte) {
 	keyMem := AllocateBytes([]byte(key))
+	defer keyMem.Free()
+
 	valMem := AllocateBytes(value)
+	defer valMem.Free()
 
 	C.extism_var_set(
 		C.uint64_t(keyMem.offset),
@@ -259,7 +265,6 @@ func (r *HTTPRequest) Send() HTTPResponse {
 	status := uint16(C.extism_http_status_code())
 
 	memory := Memory{offset, length}
-	defer memory.Free()
 
 	return HTTPResponse{
 		memory,
