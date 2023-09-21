@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          path: ./go-pdk
+          path: go-pdk
       - uses: ./go-pdk/.github/actions/libextism
 
       - name: Install Go
