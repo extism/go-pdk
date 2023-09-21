@@ -12,12 +12,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
         with:
-          toolchain: ${{ matrix.rust }}
-          override: true
+          path: go-pdk
+      - uses: ./go-pdk/.github/actions/libextism
+
+      - run: cp go-pdk/go.sum . # Needed to get setup-go to work
 
       - name: Install Go
         uses: actions/setup-go@v3
@@ -31,45 +30,24 @@ jobs:
           tinygo-version: 0.28.1
           binaryen-version: "110"
 
-      - name: Setup Python env
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
-          check-latest: true
-
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-
-      - name: Checkout extism/cli
-        uses: actions/checkout@v3
-        with:
-          repository: extism/cli
-          path: cli
-
-      - name: Install Extism & CLI
-        run: |
-          pushd cli
-          pip3 install cffi
-          pip3 install .
-          popd
-
-          extism install git
-
       - name: Compile example
         run: |
+          pushd go-pdk
+          ls -a
           pushd example
           go mod download
-          popd 
-        
+          popd
+
           make -B example
 
       - name: Test example
         run: |
+          cd go-pdk
           # --wasi is needed as there is currently some issue compiling Go PDK plugins without wasi
 
           TEST=$(extism call example/example.wasm --wasi --input "this is a test" --set-config='{"thing": "1", "a": "b"}' count_vowels)
           echo $TEST | grep '"count": 4'
           echo $TEST | grep '"config": "1"'
           echo $TEST | grep '"a": "this is var a"'
-        
+
           extism call example/http.wasm --wasi http_get --allow-host "jsonplaceholder.typicode.com" | grep '"userId": 1'
