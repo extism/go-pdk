@@ -12,12 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ matrix.rust }}
-          override: true
+      - uses: ./.github/actions/libextism
 
       - name: Install Go
         uses: actions/setup-go@v3
@@ -30,30 +25,6 @@ jobs:
         with:
           tinygo-version: 0.28.1
           binaryen-version: "110"
-
-      - name: Setup Python env
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
-          check-latest: true
-
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-
-      - name: Checkout extism/cli
-        uses: actions/checkout@v3
-        with:
-          repository: extism/cli
-          path: cli
-
-      - name: Install Extism & CLI
-        run: |
-          pushd cli
-          pip3 install cffi
-          pip3 install .
-          popd
-
-          extism install git
 
       - name: Compile example
         run: |

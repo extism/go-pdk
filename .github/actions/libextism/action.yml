@@ -1,0 +1,15 @@
+on: [workflow_call]
+
+name: libextism
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v3
+      with:
+        repository: extism/cli
+        path: .extism-cli
+    - uses: ./.extism-cli/.github/actions/extism-cli
+    - name: Install
+      shell: bash
+      run: sudo extism lib install --version git
