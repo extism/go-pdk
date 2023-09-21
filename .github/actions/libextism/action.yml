@@ -9,7 +9,7 @@ runs:
       with:
         repository: extism/cli
         path: .extism-cli
-    - uses: .extism-cli/.github/actions/extism-cli
+    - uses: ./.extism-cli/.github/actions/extism-cli
     - name: Install
       shell: bash
       run: sudo extism lib install --version git
