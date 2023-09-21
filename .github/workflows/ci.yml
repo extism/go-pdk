@@ -16,6 +16,8 @@ jobs:
           path: go-pdk
       - uses: ./go-pdk/.github/actions/libextism
 
+      - run: cp go-pdk/go.sum . # Needed to get setup-go to work
+
       - name: Install Go
         uses: actions/setup-go@v3
         with:
@@ -30,12 +32,12 @@ jobs:
 
       - name: Compile example
         run: |
-          cd go-pdk
+          pushd go-pdk
           ls -a
           pushd example
           go mod download
-          popd 
-        
+          popd
+
           make -B example
 
       - name: Test example
@@ -47,5 +49,5 @@ jobs:
           echo $TEST | grep '"count": 4'
           echo $TEST | grep '"config": "1"'
           echo $TEST | grep '"a": "this is var a"'
-        
+
           extism call example/http.wasm --wasi http_get --allow-host "jsonplaceholder.typicode.com" | grep '"userId": 1'
