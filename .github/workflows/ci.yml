@@ -31,6 +31,7 @@ jobs:
       - name: Compile example
         run: |
           cd go-pdk
+          ls -a
           pushd example
           go mod download
           popd 
