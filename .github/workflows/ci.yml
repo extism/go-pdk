@@ -12,6 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        path: ./go-pdk
       - uses: ./.github/actions/libextism
 
       - name: Install Go
@@ -28,6 +29,7 @@ jobs:
 
       - name: Compile example
         run: |
+          cd go-pdk
           pushd example
           go mod download
           popd 
@@ -36,6 +38,7 @@ jobs:
 
       - name: Test example
         run: |
+          cd go-pdk
           # --wasi is needed as there is currently some issue compiling Go PDK plugins without wasi
 
           TEST=$(extism call example/example.wasm --wasi --input "this is a test" --set-config='{"thing": "1", "a": "b"}' count_vowels)
