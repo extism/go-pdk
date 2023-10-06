@@ -7,13 +7,8 @@ import (
 	"github.com/valyala/fastjson"
 )
 
-/*
-#include "extism-pdk.h"
-*/
-import "C"
-
 type Memory struct {
-	offset uint64
+	offset extismPointer
 	length uint64
 }
 
@@ -26,49 +21,49 @@ const (
 	LogError
 )
 
-func load(offset uint64, buf []byte) {
+func load(offset extismPointer, buf []byte) {
 	length := len(buf)
 
 	for i := 0; i < length; i++ {
 		if length-i >= 8 {
-			x := C.extism_load_u64(offset + uint64(i))
+			x := extism_load_u64(offset + extismPointer(i))
 			binary.LittleEndian.PutUint64(buf[i:i+8], x)
 			i += 7
 			continue
 		}
-		buf[i] = byte(C.extism_load_u8(offset + uint64(i)))
+		buf[i] = extism_load_u8(offset + extismPointer(i))
 	}
 }
 
 func loadInput() []byte {
-	length := int(C.extism_input_length())
+	length := int(extism_input_length())
 	buf := make([]byte, length)
 
 	for i := 0; i < length; i++ {
 		if length-i >= 8 {
-			x := C.extism_input_load_u64(uint64(i))
+			x := extism_input_load_u64(extismPointer(i))
 			binary.LittleEndian.PutUint64(buf[i:i+8], x)
 			i += 7
 			continue
 		}
-		buf[i] = byte(C.extism_input_load_u8(uint64(i)))
+		buf[i] = extism_input_load_u8(extismPointer(i))
 	}
 
 	return buf
 }
 
-func store(offset uint64, buf []byte) {
+func store(offset extismPointer, buf []byte) {
 	length := len(buf)
 
 	for i := 0; i < length; i++ {
 		if length-i >= 8 {
 			x := binary.LittleEndian.Uint64(buf[i : i+8])
-			C.extism_store_u64(offset+uint64(i), C.uint64_t(x))
+			extism_store_u64(offset+extismPointer(i), x)
 			i += 7
 			continue
 		}
 
-		C.extism_store_u8(offset+uint64(i), C.uint8_t(buf[i]))
+		extism_store_u8(offset+extismPointer(i), buf[i])
 	}
 }
 
@@ -77,24 +72,24 @@ func Input() []byte {
 }
 
 func Allocate(length int) Memory {
-	clength := C.uint64_t(length)
-	offset := C.extism_alloc(clength)
+	clength := uint64(length)
+	offset := extism_alloc(clength)
 
 	return Memory{
-		offset: uint64(offset),
-		length: uint64(clength),
+		offset: offset,
+		length: clength,
 	}
 }
 
 func AllocateBytes(data []byte) Memory {
-	clength := C.uint64_t(len(data))
-	offset := C.extism_alloc(clength)
+	clength := uint64(len(data))
+	offset := extism_alloc(clength)
 
 	store(offset, data)
 
 	return Memory{
-		offset: uint64(offset),
-		length: uint64(clength),
+		offset: offset,
+		length: clength,
 	}
 
 }
@@ -108,15 +103,15 @@ func InputString() string {
 }
 
 func OutputMemory(mem Memory) {
-	C.extism_output_set(mem.offset, mem.length)
+	extism_output_set(mem.offset, mem.length)
 }
 
 func Output(data []byte) {
-	clength := C.uint64_t(len(data))
-	offset := C.extism_alloc(clength)
+	clength := uint64(len(data))
+	offset := extism_alloc(clength)
 
 	store(offset, data)
-	C.extism_output_set(offset, clength)
+	extism_output_set(offset, clength)
 }
 
 func OutputString(s string) {
@@ -127,13 +122,13 @@ func GetConfig(key string) (string, bool) {
 	mem := AllocateBytes([]byte(key))
 	defer mem.Free()
 
-	offset := C.extism_config_get(C.uint64_t(mem.offset))
-	clength := C.extism_length(offset)
+	offset := extism_config_get(mem.offset)
+	clength := extism_length(offset)
 	if offset == 0 || clength == 0 {
 		return "", false
 	}
 
-	value := make([]byte, uint64(clength))
+	value := make([]byte, clength)
 	load(offset, value)
 
 	return string(value), true
@@ -142,13 +137,13 @@ func GetConfig(key string) (string, bool) {
 func LogMemory(level LogLevel, memory Memory) {
 	switch level {
 	case LogInfo:
-		C.extism_log_info(memory.offset)
+		extism_log_info(memory.offset)
 	case LogDebug:
-		C.extism_log_debug(memory.offset)
+		extism_log_debug(memory.offset)
 	case LogWarn:
-		C.extism_log_warn(memory.offset)
+		extism_log_warn(memory.offset)
 	case LogError:
-		C.extism_log_error(memory.offset)
+		extism_log_error(memory.offset)
 	}
 }
 
@@ -162,13 +157,13 @@ func Log(level LogLevel, s string) {
 func GetVar(key string) []byte {
 	mem := AllocateBytes([]byte(key))
 
-	offset := C.extism_var_get(C.uint64_t(mem.offset))
-	clength := C.extism_length(offset)
+	offset := extism_var_get(mem.offset)
+	clength := extism_length(offset)
 	if offset == 0 || clength == 0 {
 		return nil
 	}
 
-	value := make([]byte, uint64(clength))
+	value := make([]byte, clength)
 	load(offset, value)
 
 	return value
@@ -181,18 +176,12 @@ func SetVar(key string, value []byte) {
 	valMem := AllocateBytes(value)
 	defer valMem.Free()
 
-	C.extism_var_set(
-		C.uint64_t(keyMem.offset),
-		C.uint64_t(valMem.offset),
-	)
+	extism_var_set(keyMem.offset, valMem.offset)
 }
 
 func RemoveVar(key string) {
 	mem := AllocateBytes([]byte(key))
-	C.extism_var_set(
-		C.uint64_t(mem.offset),
-		0,
-	)
+	extism_var_set(mem.offset, 0)
 }
 
 type HTTPRequest struct {
@@ -260,9 +249,9 @@ func (r *HTTPRequest) Send() HTTPResponse {
 	data := AllocateBytes(r.body)
 	defer data.Free()
 
-	offset := C.extism_http_request(C.uint64_t(req.offset), data.offset)
-	length := uint64(C.extism_length(offset))
-	status := uint16(C.extism_http_status_code())
+	offset := extism_http_request(req.offset, data.offset)
+	length := extism_length(offset)
+	status := uint16(extism_http_status_code())
 
 	memory := Memory{offset, length}
 
@@ -281,7 +270,7 @@ func (m *Memory) Store(data []byte) {
 }
 
 func (m *Memory) Free() {
-	C.extism_free(m.offset)
+	extism_free(m.offset)
 }
 
 func (m *Memory) Length() uint64 {
@@ -289,10 +278,10 @@ func (m *Memory) Length() uint64 {
 }
 
 func (m *Memory) Offset() uint64 {
-	return m.offset
+	return uint64(m.offset)
 }
 
 func FindMemory(offset uint64) Memory {
-	length := uint64(C.extism_length(offset))
-	return Memory{offset, length}
+	length := extism_length(extismPointer(offset))
+	return Memory{extismPointer(offset), length}
 }
