@@ -186,7 +186,7 @@ func RemoveVar(key string) {
 type HTTPRequestMeta struct {
 	Url     string            `json:"url"`
 	Method  string            `json:"method"`
-	Headers map[string]string `json:"header"`
+	Headers map[string]string `json:"headers"`
 }
 
 type HTTPRequest struct {
