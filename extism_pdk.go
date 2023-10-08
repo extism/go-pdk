@@ -2,9 +2,8 @@ package pdk
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"strings"
-
-	"github.com/valyala/fastjson"
 )
 
 type Memory struct {
@@ -184,11 +183,15 @@ func RemoveVar(key string) {
 	extism_var_set(mem.offset, 0)
 }
 
+type HTTPRequestMeta struct {
+	Url     string            `json:"url"`
+	Method  string            `json:"method"`
+	Headers map[string]string `json:"headers"`
+}
+
 type HTTPRequest struct {
-	url     string
-	headers map[string]string
-	method  string
-	body    []byte
+	meta HTTPRequestMeta
+	body []byte
 }
 
 type HTTPResponse struct {
@@ -211,14 +214,19 @@ func (r HTTPResponse) Status() uint16 {
 }
 
 func NewHTTPRequest(method string, url string) *HTTPRequest {
-	return &HTTPRequest{url: url, headers: nil, method: strings.ToUpper(method), body: nil}
+	return &HTTPRequest{
+		meta: HTTPRequestMeta{
+			Url:    url,
+			Method: strings.ToUpper(method),
+		},
+		body: nil}
 }
 
 func (r *HTTPRequest) SetHeader(key string, value string) *HTTPRequest {
-	if r.headers == nil {
-		r.headers = map[string]string{}
+	if r.meta.Headers == nil {
+		r.meta.Headers = make(map[string]string)
 	}
-	r.headers[key] = value
+	r.meta.Headers[key] = value
 	return r
 }
 
@@ -228,21 +236,7 @@ func (r *HTTPRequest) SetBody(body []byte) *HTTPRequest {
 }
 
 func (r *HTTPRequest) Send() HTTPResponse {
-	arena := &fastjson.Arena{}
-	json := arena.NewObject()
-	headers := arena.NewObject()
-	if r.headers != nil {
-		for k, v := range r.headers {
-			headers.Set(k, arena.NewString(v))
-		}
-
-		json.Set("header", headers)
-	}
-	json.Set("url", arena.NewString(r.url))
-	json.Set("method", arena.NewString(r.method))
-
-	var buf []byte
-	enc := json.MarshalTo(buf)
+	enc, _ := json.Marshal(r.meta)
 
 	req := AllocateBytes(enc)
 	defer req.Free()
