@@ -3,7 +3,6 @@ package pdk
 import (
 	"encoding/binary"
 	"encoding/json"
-	"github.com/extism/go-pdk/internal/models"
 	"strings"
 )
 
@@ -232,8 +231,14 @@ func (r *HTTPRequest) SetBody(body []byte) *HTTPRequest {
 	return r
 }
 
+type HTTPRequestMeta struct {
+	Url     string            `json:"url"`
+	Method  string            `json:"method"`
+	Headers map[string]string `json:"header"`
+}
+
 func (r *HTTPRequest) Send() HTTPResponse {
-	meta := models.MetaData{
+	meta := HTTPRequestMeta{
 		Url:     r.url,
 		Method:  r.method,
 		Headers: r.header,
