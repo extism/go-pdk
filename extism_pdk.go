@@ -258,10 +258,10 @@ func (r HTTPResponse) Status() uint16 {
 	return r.status
 }
 
-type ExtismHTTPMethod int32
+type HTTPMethod int32
 
 const (
-	MethodGet ExtismHTTPMethod = iota
+	MethodGet HTTPMethod = iota
 	MethodHead
 	MethodPost
 	MethodPut
@@ -272,7 +272,7 @@ const (
 	MethodTrace
 )
 
-var methods = map[ExtismHTTPMethod]string{
+var methods = map[HTTPMethod]string{
 	MethodGet:     "GET",
 	MethodHead:    "HEAD",
 	MethodPost:    "POST",
@@ -284,7 +284,7 @@ var methods = map[ExtismHTTPMethod]string{
 	MethodTrace:   "TRACE",
 }
 
-func NewHTTPRequest(method ExtismHTTPMethod, url string) *HTTPRequest {
+func NewHTTPRequest(method HTTPMethod, url string) *HTTPRequest {
 	return &HTTPRequest{
 		meta: HTTPRequestMeta{
 			Url:     url,
