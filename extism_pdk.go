@@ -258,13 +258,41 @@ func (r HTTPResponse) Status() uint16 {
 	return r.status
 }
 
-func NewHTTPRequest(method string, url string) *HTTPRequest {
+type ExtismHTTPMethod int32
+
+const (
+	MethodGet ExtismHTTPMethod = iota
+	MethodHead
+	MethodPost
+	MethodPut
+	MethodPatch // RFC 5789
+	MethodDelete
+	MethodConnect
+	MethodOptions
+	MethodTrace
+)
+
+var methods = map[ExtismHTTPMethod]string{
+	MethodGet:     "GET",
+	MethodHead:    "HEAD",
+	MethodPost:    "POST",
+	MethodPut:     "PUT",
+	MethodPatch:   "PATCH",
+	MethodDelete:  "DELETE",
+	MethodConnect: "CONNECT",
+	MethodOptions: "OPTIONS",
+	MethodTrace:   "TRACE",
+}
+
+func NewHTTPRequest(method ExtismHTTPMethod, url string) *HTTPRequest {
 	return &HTTPRequest{
 		meta: HTTPRequestMeta{
-			Url:    url,
-			Method: strings.ToUpper(method),
+			Url:     url,
+			Headers: nil,
+			Method:  methods[method],
 		},
-		body: nil}
+		body: nil,
+	}
 }
 
 func (r *HTTPRequest) SetHeader(key string, value string) *HTTPRequest {
