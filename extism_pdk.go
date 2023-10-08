@@ -2,8 +2,6 @@ package pdk
 
 import (
 	"encoding/binary"
-	"strings"
-
 	"github.com/valyala/fastjson"
 )
 
@@ -210,8 +208,34 @@ func (r HTTPResponse) Status() uint16 {
 	return r.status
 }
 
-func NewHTTPRequest(method string, url string) *HTTPRequest {
-	return &HTTPRequest{url: url, headers: nil, method: strings.ToUpper(method), body: nil}
+type ExtismHTTPMethod int32
+
+const (
+	MethodGet ExtismHTTPMethod = iota
+	MethodHead
+	MethodPost
+	MethodPut
+	MethodPatch // RFC 5789
+	MethodDelete
+	MethodConnect
+	MethodOptions
+	MethodTrace
+)
+
+var methods = map[ExtismHTTPMethod]string{
+	MethodGet:     "GET",
+	MethodHead:    "HEAD",
+	MethodPost:    "POST",
+	MethodPut:     "PUT",
+	MethodPatch:   "PATCH",
+	MethodDelete:  "DELETE",
+	MethodConnect: "CONNECT",
+	MethodOptions: "OPTIONS",
+	MethodTrace:   "TRACE",
+}
+
+func NewHTTPRequest(method ExtismHTTPMethod, url string) *HTTPRequest {
+	return &HTTPRequest{url: url, headers: nil, method: methods[method], body: nil}
 }
 
 func (r *HTTPRequest) SetHeader(key string, value string) *HTTPRequest {
