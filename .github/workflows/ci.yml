@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           cache: true
-          go-version: '1.21.1'
+          go-version: '1.21.3'
 
       - name: Install TinyGo
         uses: acifani/setup-tinygo@v1.1.0
@@ -31,23 +31,19 @@ jobs:
           binaryen-version: "116"
 
       - name: Compile example
+        working-directory: go-pdk
         run: |
-          pushd go-pdk
-          ls -a
-          pushd example
-          go mod download
-          popd
-
+          ls -a example
           make -B example
 
       - name: Test example
+        working-directory: go-pdk
         run: |
-          cd go-pdk
           # --wasi is needed as there is currently some issue compiling Go PDK plugins without wasi
 
-          TEST=$(extism call example/example.wasm --wasi --github-token="$GITHUB_TOKEN" --input "this is a test" --set-config='{"thing": "1", "a": "b"}' count_vowels)
+          TEST=$(extism call example/tiny_countvowels.wasm --wasi --github-token="$GITHUB_TOKEN" --input "this is a test" --set-config='{"thing": "1", "a": "b"}' count_vowels)
           echo $TEST | grep '"count": 4'
           echo $TEST | grep '"config": "1"'
           echo $TEST | grep '"a": "this is var a"'
 
-          extism call example/http.wasm --github-token="$GITHUB_TOKEN" --wasi http_get --allow-host "jsonplaceholder.typicode.com" | grep '"userId": 1'
+          extism call example/tiny_http.wasm --wasi http_get --github-token="$GITHUB_TOKEN" --allow-host "jsonplaceholder.typicode.com" | grep '"userId": 1'
