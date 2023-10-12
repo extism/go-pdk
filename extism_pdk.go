@@ -7,7 +7,7 @@ import (
 )
 
 type Memory struct {
-	offset extismPointer
+	offset ExtismPointer
 	length uint64
 }
 
@@ -21,17 +21,17 @@ const (
 	LogTrace
 )
 
-func load(offset extismPointer, buf []byte) {
+func load(offset ExtismPointer, buf []byte) {
 	length := len(buf)
 
 	for i := 0; i < length; i++ {
 		if length-i >= 8 {
-			x := extism_load_u64(offset + extismPointer(i))
+			x := extism_load_u64(offset + ExtismPointer(i))
 			binary.LittleEndian.PutUint64(buf[i:i+8], x)
 			i += 7
 			continue
 		}
-		buf[i] = extism_load_u8(offset + extismPointer(i))
+		buf[i] = extism_load_u8(offset + ExtismPointer(i))
 	}
 }
 
@@ -41,29 +41,29 @@ func loadInput() []byte {
 
 	for i := 0; i < length; i++ {
 		if length-i >= 8 {
-			x := extism_input_load_u64(extismPointer(i))
+			x := extism_input_load_u64(ExtismPointer(i))
 			binary.LittleEndian.PutUint64(buf[i:i+8], x)
 			i += 7
 			continue
 		}
-		buf[i] = extism_input_load_u8(extismPointer(i))
+		buf[i] = extism_input_load_u8(ExtismPointer(i))
 	}
 
 	return buf
 }
 
-func store(offset extismPointer, buf []byte) {
+func store(offset ExtismPointer, buf []byte) {
 	length := len(buf)
 
 	for i := 0; i < length; i++ {
 		if length-i >= 8 {
 			x := binary.LittleEndian.Uint64(buf[i : i+8])
-			extism_store_u64(offset+extismPointer(i), x)
+			extism_store_u64(offset+ExtismPointer(i), x)
 			i += 7
 			continue
 		}
 
-		extism_store_u8(offset+extismPointer(i), buf[i])
+		extism_store_u8(offset+ExtismPointer(i), buf[i])
 	}
 }
 
@@ -265,6 +265,12 @@ func (r *HTTPRequest) Send() HTTPResponse {
 	}
 }
 
+func (m *Memory) ReadBytes() []byte {
+	buff := make([]byte, m.length)
+	m.Load(buff)
+	return buff
+}
+
 func (m *Memory) Load(buffer []byte) {
 	load(m.offset, buffer)
 }
@@ -286,6 +292,6 @@ func (m *Memory) Offset() uint64 {
 }
 
 func FindMemory(offset uint64) Memory {
-	length := extism_length(extismPointer(offset))
-	return Memory{extismPointer(offset), length}
+	length := extism_length(ExtismPointer(offset))
+	return Memory{ExtismPointer(offset), length}
 }

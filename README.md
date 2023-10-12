@@ -228,9 +228,29 @@ to do this correctly. So we recommend reading out [concept doc on Host Functions
 
 ### A Simple Example
 
-TODO: fill out
+Host functions have a similar interface as exports. You just need to declare them as extern on the top of your lib.rs. You only declare the interface as it is the host's responsibility to provide the implementation:
+
 
 ```go
+//go:wasmimport env a_python_func
+func aPythonFunc(pdk.ExtismPointer) pdk.ExtismPointer
+```
+
+We should be able to call this function as a normal Go function. Note that we need to manually handle the pointer casting:
+
+```go
+//export hello_from_python
+func helloFromPython() int32 {
+        msg := "An argument to send to Python"
+        mem := pdk.AllocateString(msg)
+        defer mem.Free()
+        ptr := aPythonFunc(pdk.ExtismPointer(mem.Offset()))
+        rmem := pdk.FindMemory(uint64(ptr))
+        response := string(rmem.ReadBytes())
+        pdk.OutputString(response)
+        return 0
+}
+
 ```
 
 ### Testing it out
@@ -239,7 +259,7 @@ We can't really test this from the Extism CLI as something must provide the impl
 write out the Python side here. Check out the [docs for Host SDKs](https://extism.org/docs/concepts/host-sdk) to implement a host function in a language of your choice.
 
 ```python
-from extism import host_fn, Function, ValType
+from extism import host_fn, Function, ValType, Plugin
 
 @host_fn
 def a_python_func(plugin, input_, output, _user_data):
@@ -271,6 +291,7 @@ functions = [
     )
 ]
 
+manifest = {"wasm": [{"path": "/path/to/plugin.wasm"}]}
 plugin = Plugin(manifest, functions=functions)
 result = plugin.call('hello_from_python')
 print(result)
