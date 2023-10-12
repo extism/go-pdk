@@ -18,6 +18,7 @@ const (
 	LogDebug
 	LogWarn
 	LogError
+	LogTrace
 )
 
 func load(offset extismPointer, buf []byte) {
@@ -115,6 +116,15 @@ func Output(data []byte) {
 
 func OutputString(s string) {
 	Output([]byte(s))
+}
+
+func SetError(err error) {
+	SetErrorString(err.Error())
+}
+
+func SetErrorString(err string) {
+	mem := AllocateString(err)
+	extism_error_set(mem.offset)
 }
 
 func GetConfig(key string) (string, bool) {
