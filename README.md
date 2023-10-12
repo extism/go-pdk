@@ -288,12 +288,13 @@ functions = [
         [ValType.I64],
         [ValType.I64],
         a_python_func,
+        None
     )
 ]
 
 manifest = {"wasm": [{"path": "/path/to/plugin.wasm"}]}
-plugin = Plugin(manifest, functions=functions)
-result = plugin.call('hello_from_python')
+plugin = Plugin(manifest, functions=functions, wasi=True)
+result = plugin.call('hello_from_python').decode('utf-8')
 print(result)
 ```
 
