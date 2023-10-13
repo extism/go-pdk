@@ -227,7 +227,7 @@ Host functions have a similar interface as exports. You just need to declare the
 
 ```go
 //go:wasmimport env a_python_func
-func aPythonFunc(pdk.ExtismPointer) pdk.ExtismPointer
+func aPythonFunc(uint64) uint64
 ```
 
 We should be able to call this function as a normal Go function. Note that we need to manually handle the pointer casting:
@@ -238,8 +238,8 @@ func helloFromPython() int32 {
         msg := "An argument to send to Python"
         mem := pdk.AllocateString(msg)
         defer mem.Free()
-        ptr := aPythonFunc(pdk.ExtismPointer(mem.Offset()))
-        rmem := pdk.FindMemory(uint64(ptr))
+        ptr := aPythonFunc(mem.Offset())
+        rmem := pdk.FindMemory(ptr)
         response := string(rmem.ReadBytes())
         pdk.OutputString(response)
         return 0
