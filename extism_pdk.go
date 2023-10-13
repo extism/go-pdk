@@ -188,6 +188,34 @@ func SetVar(key string, value []byte) {
 	extism_var_set(keyMem.offset, valMem.offset)
 }
 
+func GetVarInt(key string) int {
+	mem := AllocateBytes([]byte(key))
+
+	offset := extism_var_get(mem.offset)
+	clength := extism_length(offset)
+	if offset == 0 || clength == 0 {
+		return 0
+	}
+
+	value := make([]byte, clength)
+	load(offset, value)
+
+	return int(binary.LittleEndian.Uint64(value))
+}
+
+func SetVarInt(key string, value int) {
+	keyMem := AllocateBytes([]byte(key))
+	defer keyMem.Free()
+
+	bytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(bytes, uint64(value))
+
+	valMem := AllocateBytes(bytes)
+	defer valMem.Free()
+
+	extism_var_set(keyMem.offset, valMem.offset)
+}
+
 func RemoveVar(key string) {
 	mem := AllocateBytes([]byte(key))
 	extism_var_set(mem.offset, 0)

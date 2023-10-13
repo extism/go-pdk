@@ -159,21 +159,13 @@ Variables are another key-value mechanism but it's a mutable data store that
 will persist across function calls. These variables will persist as long as the
 host has loaded and not freed the plug-in. 
 
-TODO: should we have some more convenience methods here for types other that byte arrays?
-
 ```go
 //export count
 func count() int32 {
-	countbs := pdk.GetVar("count")
-	count := uint32(0)
-	if countbs != nil {
-		count = binary.LittleEndian.Uint32(countbs)
-	}
+	count := pdk.GetVarInt("count")
 	count = count + 1
-	countbs = make([]byte, 4)
-	binary.LittleEndian.PutUint32(countbs, count)
-	pdk.SetVar("count", countbs)
-	pdk.OutputString(string(count))
+	pdk.SetVarInt("count", count)
+	pdk.OutputString(strconv.Itoa(count))
 	return 0
 }
 ```
