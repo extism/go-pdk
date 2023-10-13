@@ -170,6 +170,8 @@ func count() int32 {
 }
 ```
 
+> **Note**: Use the untyped variants `pdk.SetVar(string, []byte)` and `pdk.GetVar(string) []byte` to handle your own types.
+
 ## Logging
 
 Because Wasm modules by default do not have access to the system, printing to stdout won't work (unless you use WASI). Extism provides some simple logging macros that allow you to use the host application to log without having to give the plug-in permission to make syscalls.
