@@ -178,7 +178,7 @@ Because Wasm modules by default do not have access to the system, printing to st
 
 ```go
 //export log_stuff
-func log_stuff() int32 {
+func logStuff() int32 {
 	pdk.Log(pdk.LogInfo, "An info log!")
 	pdk.Log(pdk.LogDebug, "A debug log!")
 	pdk.Log(pdk.LogWarn, "A trace log!")
@@ -203,11 +203,29 @@ extism call plugin.wasm log_stuff --wasi --log-level=trace
 
 ## HTTP
 
-Sometimes it is useful to let a plug-in make HTTP calls.
-
-TODO fill out
+Sometimes it is useful to let a plug-in make HTTP calls. [See this example](example/http.go)
 
 ```go
+//export http_get
+func httpGet() int32 {
+	// create an HTTP Request (withuot relying on WASI), set headers as needed
+	req := pdk.NewHTTPRequest("GET", "https://jsonplaceholder.typicode.com/todos/1")
+	req.SetHeader("some-name", "some-value")
+	req.SetHeader("another", "again")
+	// send the request, get response back (can check status on response via res.Status())
+	res := req.Send()
+
+	pdk.OutputMemory(res.Memory())
+
+	return 0
+}
+```
+
+By default, Extism modules cannot make HTTP requests unless you specify which hosts it can connect to. You can use `--alow-host` in the Extism CLI to set this:
+
+```
+extism call plugin.wasm http_get --wasi --allow-host='*.typicode.com'
+# => { "userId": 1, "id": 1, "title": "delectus aut autem", "completed": false }
 ```
 
 ## Imports (Host Functions)
@@ -235,14 +253,14 @@ We should be able to call this function as a normal Go function. Note that we ne
 ```go
 //export hello_from_python
 func helloFromPython() int32 {
-        msg := "An argument to send to Python"
-        mem := pdk.AllocateString(msg)
-        defer mem.Free()
-        ptr := aPythonFunc(mem.Offset())
-        rmem := pdk.FindMemory(ptr)
-        response := string(rmem.ReadBytes())
-        pdk.OutputString(response)
-        return 0
+    msg := "An argument to send to Python"
+    mem := pdk.AllocateString(msg)
+    defer mem.Free()
+    ptr := aPythonFunc(mem.Offset())
+    rmem := pdk.FindMemory(ptr)
+    response := string(rmem.ReadBytes())
+    pdk.OutputString(response)
+    return 0
 }
 
 ```
