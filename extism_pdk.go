@@ -18,6 +18,7 @@ const (
 	LogDebug
 	LogWarn
 	LogError
+	LogTrace
 )
 
 func load(offset extismPointer, buf []byte) {
@@ -117,6 +118,15 @@ func OutputString(s string) {
 	Output([]byte(s))
 }
 
+func SetError(err error) {
+	SetErrorString(err.Error())
+}
+
+func SetErrorString(err string) {
+	mem := AllocateString(err)
+	extism_error_set(mem.offset)
+}
+
 func GetConfig(key string) (string, bool) {
 	mem := AllocateBytes([]byte(key))
 	defer mem.Free()
@@ -173,6 +183,34 @@ func SetVar(key string, value []byte) {
 	defer keyMem.Free()
 
 	valMem := AllocateBytes(value)
+	defer valMem.Free()
+
+	extism_var_set(keyMem.offset, valMem.offset)
+}
+
+func GetVarInt(key string) int {
+	mem := AllocateBytes([]byte(key))
+
+	offset := extism_var_get(mem.offset)
+	clength := extism_length(offset)
+	if offset == 0 || clength == 0 {
+		return 0
+	}
+
+	value := make([]byte, clength)
+	load(offset, value)
+
+	return int(binary.LittleEndian.Uint64(value))
+}
+
+func SetVarInt(key string, value int) {
+	keyMem := AllocateBytes([]byte(key))
+	defer keyMem.Free()
+
+	bytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(bytes, uint64(value))
+
+	valMem := AllocateBytes(bytes)
 	defer valMem.Free()
 
 	extism_var_set(keyMem.offset, valMem.offset)
@@ -253,6 +291,12 @@ func (r *HTTPRequest) Send() HTTPResponse {
 		memory,
 		status,
 	}
+}
+
+func (m *Memory) ReadBytes() []byte {
+	buff := make([]byte, m.length)
+	m.Load(buff)
+	return buff
 }
 
 func (m *Memory) Load(buffer []byte) {
