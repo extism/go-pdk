@@ -249,7 +249,7 @@ Host functions have a similar interface as exports. You just need to declare the
 
 
 ```go
-//go:wasmimport env a_python_func
+//go:wasmimport extism:user a_python_func
 func aPythonFunc(uint64) uint64
 ```
 
