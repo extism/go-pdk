@@ -10,6 +10,10 @@ Include the library with Go get:
 go get github.com/extism/go-pdk
 ```
 
+## Reference Documentation
+
+You can find the reference documentation for this library on [pkg.go.dev](https://pkg.go.dev/github.com/extism/go-pdk).
+
 ## Getting Started
 
 The goal of writing an [Extism plug-in](https://extism.org/docs/concepts/plug-in) is to compile your Go code to a Wasm module with exported functions that the host application can invoke. The first thing you should understand is creating an export. Let's write a simple program that exports a `greet` function which will take a name as a string and return a greeting string. Paste this into your `main.go`:
@@ -36,7 +40,7 @@ Some things to note about this code:
 
 1. The `//export greet` comment is required. This marks the greet function as an export with the name `greet` that can be called by the host.
 2. We need a `main` but it is unused.
-3. Exports in the Go PDK are coded to the raw ABI. You get parameters from the host by calling `pdk.Input()` and you send returns back with the `pdk.Output*()` methods.
+3. Exports in the Go PDK are coded to the raw ABI. You get parameters from the host by calling [pdk.Input* functions](https://pkg.go.dev/github.com/extism/go-pdk#Input) and you send returns back with the [pdk.Output* functions](https://pkg.go.dev/github.com/extism/go-pdk#Output).
 4. An Extism export expects an i32 return code. `0` is success and `1` is a failure.
 
 Compile this with the command:
@@ -59,7 +63,7 @@ extism call plugin.wasm greet --input "Benjamin" --wasi
 
 ### More Exports: Error Handling
 
-Suppose we want to re-write our greeting module to never greet Benjamins. We can use `pdk.SetError`:
+Suppose we want to re-write our greeting module to never greet Benjamins. We can use [pdk.SetError](https://pkg.go.dev/github.com/extism/go-pdk#SetError) or [pdk.SetErrorString](https://pkg.go.dev/github.com/extism/go-pdk#SetErrorString):
 
 ```go
 //export greet
@@ -130,7 +134,7 @@ extism call plugin.wasm add --input='{"a": 20, "b": 21}' --wasi
 ## Configs
 
 Configs are key-value pairs that can be passed in by the host when creating a
-plug-in. These can be useful to statically configure the plug-in with some data that exists across every function call. Here is a trivial example:
+plug-in. These can be useful to statically configure the plug-in with some data that exists across every function call. Here is a trivial example using [pdk.GetConfig](https://pkg.go.dev/github.com/extism/go-pdk#GetConfig):
 
 ```go
 //export greet
@@ -170,11 +174,12 @@ func count() int32 {
 }
 ```
 
-> **Note**: Use the untyped variants `pdk.SetVar(string, []byte)` and `pdk.GetVar(string) []byte` to handle your own types.
+> **Note**: Use the untyped variants [pdk.SetVar(string, []byte)](https://pkg.go.dev/github.com/extism/go-pdk#SetVar) and [pdk.GetVar(string) []byte](https://pkg.go.dev/github.com/extism/go-pdk#GetVar) to handle your own types.
 
 ## Logging
 
-Because Wasm modules by default do not have access to the system, printing to stdout won't work (unless you use WASI). Extism provides some simple logging macros that allow you to use the host application to log without having to give the plug-in permission to make syscalls.
+Because Wasm modules by default do not have access to the system, printing to stdout won't work (unless you use WASI).
+Extism provides a simple [logging function](https://pkg.go.dev/github.com/extism/go-pdk#Log) that allows you to use the host application to log without having to give the plug-in permission to make syscalls.
 
 ```go
 //export log_stuff
@@ -203,7 +208,7 @@ extism call plugin.wasm log_stuff --wasi --log-level=trace
 
 ## HTTP
 
-Sometimes it is useful to let a plug-in make HTTP calls. [See this example](example/http.go)
+Sometimes it is useful to let a plug-in [make HTTP calls](https://pkg.go.dev/github.com/extism/go-pdk#HTTPRequest.Send). [See this example](example/http.go)
 
 ```go
 //export http_get
