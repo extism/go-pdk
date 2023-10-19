@@ -241,12 +241,11 @@ if you host application is written in Python, it can pass a Python function down
 where you can invoke it.
 
 This topic can get fairly complicated and we have not yet fully abstracted the Wasm knowledge you need
-to do this correctly. So we recommend reading out [concept doc on Host Functions](https://extism.org/docs/concepts/host-functions) before you get started.
+to do this correctly. So we recommend reading our [concept doc on Host Functions](https://extism.org/docs/concepts/host-functions) before you get started.
 
 ### A Simple Example
 
-Host functions have a similar interface as exports. You just need to declare them as extern on the top of your lib.rs. You only declare the interface as it is the host's responsibility to provide the implementation:
-
+Host functions have a similar interface as exports. You just need to declare them as extern on the top of your main.go. You only declare the interface as it is the host's responsibility to provide the implementation:
 
 ```go
 //go:wasmimport env a_python_func
