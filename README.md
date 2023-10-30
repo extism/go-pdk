@@ -248,7 +248,7 @@ to do this correctly. So we recommend reading our [concept doc on Host Functions
 Host functions have a similar interface as exports. You just need to declare them as extern on the top of your main.go. You only declare the interface as it is the host's responsibility to provide the implementation:
 
 ```go
-//go:wasmimport env a_python_func
+//go:wasmimport extism:user a_python_func
 func aPythonFunc(uint64) uint64
 ```
 
