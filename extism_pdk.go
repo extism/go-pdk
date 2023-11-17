@@ -23,15 +23,17 @@ const (
 
 func load(offset extismPointer, buf []byte) {
 	length := len(buf)
+	chunkCount := length >> 3
 
-	for i := 0; i < length; i++ {
-		if length-i >= 8 {
-			x := extism_load_u64(offset + extismPointer(i))
-			binary.LittleEndian.PutUint64(buf[i:i+8], x)
-			i += 7
-			continue
-		}
-		buf[i] = extism_load_u8(offset + extismPointer(i))
+	for chunkIdx := 0; chunkIdx < chunkCount; chunkIdx++ {
+		i := chunkIdx << 3
+		binary.LittleEndian.PutUint64(buf[i:i+8], extism_load_u64(offset+extismPointer(i)))
+	}
+
+	remainder := length & 7
+	remainderOffset := chunkCount << 3
+	for index := remainderOffset; index < (remainder + remainderOffset); index++ {
+		buf[index] = extism_load_u8(offset + extismPointer(index))
 	}
 }
 
@@ -39,14 +41,17 @@ func loadInput() []byte {
 	length := int(extism_input_length())
 	buf := make([]byte, length)
 
-	for i := 0; i < length; i++ {
-		if length-i >= 8 {
-			x := extism_input_load_u64(extismPointer(i))
-			binary.LittleEndian.PutUint64(buf[i:i+8], x)
-			i += 7
-			continue
-		}
-		buf[i] = extism_input_load_u8(extismPointer(i))
+	chunkCount := length >> 3
+
+	for chunkIdx := 0; chunkIdx < chunkCount; chunkIdx++ {
+		i := chunkIdx << 3
+		binary.LittleEndian.PutUint64(buf[i:i+8], extism_input_load_u64(extismPointer(i)))
+	}
+
+	remainder := length & 7
+	remainderOffset := chunkCount << 3
+	for index := remainderOffset; index < (remainder + remainderOffset); index++ {
+		buf[index] = extism_input_load_u8(extismPointer(index))
 	}
 
 	return buf
@@ -54,16 +59,18 @@ func loadInput() []byte {
 
 func store(offset extismPointer, buf []byte) {
 	length := len(buf)
+	chunkCount := length >> 3
 
-	for i := 0; i < length; i++ {
-		if length-i >= 8 {
-			x := binary.LittleEndian.Uint64(buf[i : i+8])
-			extism_store_u64(offset+extismPointer(i), x)
-			i += 7
-			continue
-		}
+	for chunkIdx := 0; chunkIdx < chunkCount; chunkIdx++ {
+		i := chunkIdx << 3
+		x := binary.LittleEndian.Uint64(buf[i : i+8])
+		extism_store_u64(offset+extismPointer(i), x)
+	}
 
-		extism_store_u8(offset+extismPointer(i), buf[i])
+	remainder := length & 7
+	remainderOffset := chunkCount << 3
+	for index := remainderOffset; index < (remainder + remainderOffset); index++ {
+		extism_store_u8(offset+extismPointer(index), buf[index])
 	}
 }
 
