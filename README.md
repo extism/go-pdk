@@ -43,6 +43,12 @@ Some things to note about this code:
 3. Exports in the Go PDK are coded to the raw ABI. You get parameters from the host by calling [pdk.Input* functions](https://pkg.go.dev/github.com/extism/go-pdk#Input) and you send returns back with the [pdk.Output* functions](https://pkg.go.dev/github.com/extism/go-pdk#Output).
 4. An Extism export expects an i32 return code. `0` is success and `1` is a failure.
 
+Install the `tinygo` compiler: 
+
+See https://tinygo.org/getting-started/install/ for instructions for your platform. 
+
+> Note: while the core Go toolchain has support to target WebAssembly, we find `tinygo` to work well for plug-in code. Please issues if you try building with `go build` instead have problems!
+
 Compile this with the command:
 
 ```bash
