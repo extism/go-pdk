@@ -47,7 +47,7 @@ Install the `tinygo` compiler:
 
 See https://tinygo.org/getting-started/install/ for instructions for your platform. 
 
-> Note: while the core Go toolchain has support to target WebAssembly, we find `tinygo` to work well for plug-in code. Please issues if you try building with `go build` instead have problems!
+> Note: while the core Go toolchain has support to target WebAssembly, we find `tinygo` to work well for plug-in code. Please issues if you try building with `go build` instead & have problems!
 
 Compile this with the command:
 
