@@ -271,16 +271,29 @@ const (
 	MethodTrace
 )
 
-var methods = map[HTTPMethod]string{
-	MethodGet:     "GET",
-	MethodHead:    "HEAD",
-	MethodPost:    "POST",
-	MethodPut:     "PUT",
-	MethodPatch:   "PATCH",
-	MethodDelete:  "DELETE",
-	MethodConnect: "CONNECT",
-	MethodOptions: "OPTIONS",
-	MethodTrace:   "TRACE",
+func (m HTTPMethod) String() string {
+	switch m {
+	case MethodGet:
+		return "GET"
+	case MethodHead:
+		return "HEAD"
+	case MethodPost:
+		return "POST"
+	case MethodPut:
+		return "PUT"
+	case MethodPatch:
+		return "PATCH"
+	case MethodDelete:
+		return "DELETE"
+	case MethodConnect:
+		return "CONNECT"
+	case MethodOptions:
+		return "OPTIONS"
+	case MethodTrace:
+		return "TRACE"
+	default:
+		return ""
+	}
 }
 
 func NewHTTPRequest(method HTTPMethod, url string) *HTTPRequest {
@@ -288,7 +301,7 @@ func NewHTTPRequest(method HTTPMethod, url string) *HTTPRequest {
 		meta: HTTPRequestMeta{
 			Url:     url,
 			Headers: nil,
-			Method:  methods[method],
+			Method:  method.String(),
 		},
 		body: nil,
 	}
