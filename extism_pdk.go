@@ -3,7 +3,6 @@ package pdk
 import (
 	"encoding/binary"
 	"encoding/json"
-	"strings"
 )
 
 type Memory struct {
