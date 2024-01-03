@@ -8,6 +8,9 @@ func extism_input_length() uint64
 //go:wasmimport extism:host/env length
 func extism_length(extismPointer) uint64
 
+//go:wasmimport extism:host/env length_unsafe
+func extism_length_unsafe(extismPointer) uint64
+
 //go:wasmimport extism:host/env alloc
 func extism_alloc(uint64) extismPointer
 

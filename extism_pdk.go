@@ -289,7 +289,7 @@ func (r *HTTPRequest) Send() HTTPResponse {
 	defer data.Free()
 
 	offset := extism_http_request(req.offset, data.offset)
-	length := extism_length(offset)
+	length := extism_length_unsafe(offset)
 	status := uint16(extism_http_status_code())
 
 	memory := Memory{offset, length}
@@ -328,5 +328,8 @@ func (m *Memory) Offset() uint64 {
 
 func FindMemory(offset uint64) Memory {
 	length := extism_length(extismPointer(offset))
+	if length == 0 {
+		return Memory{0, 0}
+	}
 	return Memory{extismPointer(offset), length}
 }
