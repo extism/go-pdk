@@ -47,3 +47,7 @@ jobs:
           echo $TEST | grep '"a": "this is var a"'
 
           extism call example/tiny_http.wasm --wasi http_get --github-token="$GITHUB_TOKEN" --allow-host "jsonplaceholder.typicode.com" | grep '"userId": 1'
+
+
+          # run all the tests
+          make test

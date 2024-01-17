@@ -3,7 +3,6 @@ package pdk
 import (
 	"encoding/binary"
 	"encoding/json"
-	"strings"
 )
 
 type Memory struct {
@@ -258,13 +257,54 @@ func (r HTTPResponse) Status() uint16 {
 	return r.status
 }
 
-func NewHTTPRequest(method string, url string) *HTTPRequest {
+type HTTPMethod int32
+
+const (
+	MethodGet HTTPMethod = iota
+	MethodHead
+	MethodPost
+	MethodPut
+	MethodPatch // RFC 5789
+	MethodDelete
+	MethodConnect
+	MethodOptions
+	MethodTrace
+)
+
+func (m HTTPMethod) String() string {
+	switch m {
+	case MethodGet:
+		return "GET"
+	case MethodHead:
+		return "HEAD"
+	case MethodPost:
+		return "POST"
+	case MethodPut:
+		return "PUT"
+	case MethodPatch:
+		return "PATCH"
+	case MethodDelete:
+		return "DELETE"
+	case MethodConnect:
+		return "CONNECT"
+	case MethodOptions:
+		return "OPTIONS"
+	case MethodTrace:
+		return "TRACE"
+	default:
+		return ""
+	}
+}
+
+func NewHTTPRequest(method HTTPMethod, url string) *HTTPRequest {
 	return &HTTPRequest{
 		meta: HTTPRequestMeta{
-			Url:    url,
-			Method: strings.ToUpper(method),
+			Url:     url,
+			Headers: nil,
+			Method:  method.String(),
 		},
-		body: nil}
+		body: nil,
+	}
 }
 
 func (r *HTTPRequest) SetHeader(key string, value string) *HTTPRequest {
