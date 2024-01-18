@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/extism/go-pdk"
-	_ "github.com/extism/go-pdk/pdk_reactor"
+	_ "github.com/extism/go-pdk/wasi-reactor"
 )
 
 //export read_file

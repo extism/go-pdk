@@ -2,5 +2,5 @@ go 1.21.1
 
 use (
 	.
-	./pdk_reactor
+	./wasi-reactor
 )

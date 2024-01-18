@@ -1,4 +1,4 @@
-package pdk_reactor
+package reactor
 
 //export __wasm_call_ctors
 func __wasm_call_ctors()
