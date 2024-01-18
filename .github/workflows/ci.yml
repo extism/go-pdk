@@ -48,6 +48,7 @@ jobs:
 
           extism call example/tiny_http.wasm --wasi http_get --github-token="$GITHUB_TOKEN" --allow-host "jsonplaceholder.typicode.com" | grep '"userId": 1'
 
+          extism call example/tiny_reactor.wasm read_file --input "example/reactor/test.txt" --allow-path ./example/reactor --wasi --log-level info | grep 'Hello World!'
 
           # run all the tests
           make test

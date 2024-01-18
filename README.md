@@ -326,6 +326,44 @@ python3 app.py
 # => An argument to send to Python!
 ```
 
+## Reactor modules
+
+Since TinyGo doesn't support [Reactor modules](https://dylibso.com/blog/wasi-command-reactor/) yet, If you want to use WASI inside your Reactor module functions (exported functions other than `main`), you'll need to import `wasi-reactor` module which makes sure libc and go runtime are properly initialized:
+
+```go
+package main
+
+import (
+	"os"
+
+	"github.com/extism/go-pdk"
+	_ "github.com/extism/go-pdk/wasi-reactor"
+)
+
+//export read_file
+func read_file() {
+	name := pdk.InputString()
+
+	content, err := os.ReadFile(name)
+	if err != nil {
+		pdk.Log(pdk.LogError, err.Error())
+		return
+	}
+
+	pdk.Output(content)
+}
+
+func main() {}
+```
+
+```bash
+tinygo build -target wasi -o reactor.wasm .\tiny_main.go
+extism call ./reactor.wasm read_file --input "./test.txt" --allow-path . --wasi --log-level info
+# => Hello World!
+```
+
+Note: this is not required if you only have the `main` function.
+
 ### Reach Out!
 
 Have a question or just want to drop in and say hi? [Hop on the Discord](https://extism.org/discord)!
