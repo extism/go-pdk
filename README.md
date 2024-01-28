@@ -281,13 +281,10 @@ We can't really test this from the Extism CLI as something must provide the impl
 write out the Python side here. Check out the [docs for Host SDKs](https://extism.org/docs/concepts/host-sdk) to implement a host function in a language of your choice.
 
 ```python
-from extism import host_fn, Function, ValType, Plugin
+from extism import host_fn, Plugin
 
-@host_fn
-def a_python_func(plugin, input_, output, _user_data):
-    # The plug-in is passing us a string
-    input_str = plugin.input_string(input_[0])
-
+@host_fn()
+def a_python_func(input: str) -> str:
     # just printing this out to prove we're in Python land
     print("Hello from Python!")
 
@@ -295,28 +292,15 @@ def a_python_func(plugin, input_, output, _user_data):
     # but you could imagine here we could add some
     # applicaiton code like query or manipulate the database
     # or our application APIs
-    input_str += "!"
-
-    # set the new string as the return value to the plug-in
-    plugin.return_string(output[0], input_str)
+    return input + "!"
 ```
 
 Now when we load the plug-in we pass the host function:
  
 ```python
-functions = [
-    Function(
-        "a_python_func",
-        [ValType.I64],
-        [ValType.I64],
-        a_python_func,
-        None
-    )
-]
-
 manifest = {"wasm": [{"path": "/path/to/plugin.wasm"}]}
-plugin = Plugin(manifest, functions=functions, wasi=True)
-result = plugin.call('hello_from_python').decode('utf-8')
+plugin = Plugin(manifest, functions=[a_python_func], wasi=True)
+result = plugin.call('hello_from_python', b'').decode('utf-8')
 print(result)
 ```
 
