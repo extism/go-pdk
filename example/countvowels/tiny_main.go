@@ -22,7 +22,7 @@ type CountVowelsOuptut struct {
 //export count_vowels_typed
 func count_vowels_typed() int32 {
 	var input CountVowelsInput
-	if err := pdk.InputJson(&input); err != nil {
+	if err := pdk.InputJSON(&input); err != nil {
 		pdk.SetError(err)
 		return -1
 	}
@@ -34,7 +34,7 @@ func count_vowels_typed() int32 {
 //export count_vowels_json_output
 func count_vowels_json_output() int32 {
 	output := CountVowelsOuptut{Count: 42, Total: 2.1e7, Vowels: "aAeEiIoOuUyY"}
-	err := pdk.OutputJson(output)
+	err := pdk.OutputJSON(output)
 	if err != nil {
 		pdk.SetError(err)
 		return -1

@@ -77,16 +77,16 @@ func Input() []byte {
 	return loadInput()
 }
 
-func JsonFrom(offset uint64, v any) error {
+func JSONFrom(offset uint64, v any) error {
 	mem := FindMemory(offset)
 	return json.Unmarshal(mem.ReadBytes(), v)
 }
 
-func InputJson(v any) error {
+func InputJSON(v any) error {
 	return json.Unmarshal(Input(), v)
 }
 
-func OutputJson(v any) error {
+func OutputJSON(v any) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err
