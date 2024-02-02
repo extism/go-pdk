@@ -116,18 +116,19 @@ type Sum struct {
 //export add
 func add() int32 {
 	params := Add{}
-	err := json.Unmarshal(pdk.Input(), &params)
+	// use json input helper, which automatically unmarshals the plugin input into your struct
+	err := pdk.InputJSON(&params)
 	if err != nil {
 		pdk.SetError(err)
 		return 1
 	}
 	sum := Sum{Sum: params.A + params.B}
-	output, err := json.Marshal(sum)
+	// use json output helper, which automatically marshals your struct to the plugin output
+	output, err := pdk.OutputJSON(sum)
 	if err != nil {
 		pdk.SetError(err)
 		return 1
 	}
-	pdk.Output(output)
 	return 0
 }
 ```

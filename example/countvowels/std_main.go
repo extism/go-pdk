@@ -4,6 +4,7 @@
 package main
 
 import (
+	// "fmt"
 	"strconv"
 
 	"github.com/extism/go-pdk"
@@ -13,10 +14,45 @@ import (
 // `_start` via WASI. So, `main` functions should contain the plugin behavior, that the host will
 // invoke by explicitly calling `_start`.
 func main() {
-	countVowels()
+	count_vowels()
+	count_vowels_typed()
+	count_vowels_json_output()
 }
 
-func countVowels() int32 {
+type CountVowelsInput struct {
+	Input string `json:"input"`
+}
+
+type CountVowelsOuptut struct {
+	Count  int    `json:"count"`
+	Total  int    `json:"total"`
+	Vowels string `json:"vowels"`
+}
+
+//export count_vowels_typed
+func count_vowels_typed() int32 {
+	var input CountVowelsInput
+	if err := pdk.InputJSON(&input); err != nil {
+		pdk.SetError(err)
+		return -1
+	}
+
+	pdk.OutputString(input.Input)
+	return 0
+}
+
+//export count_vowels_json_output
+func count_vowels_json_output() int32 {
+	output := CountVowelsOuptut{Count: 42, Total: 2.1e7, Vowels: "aAeEiIoOuUyY"}
+	err := pdk.OutputJSON(output)
+	if err != nil {
+		pdk.SetError(err)
+		return -1
+	}
+	return 0
+}
+
+func count_vowels() int32 {
 	input := pdk.Input()
 
 	count := 0

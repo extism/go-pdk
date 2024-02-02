@@ -77,6 +77,25 @@ func Input() []byte {
 	return loadInput()
 }
 
+func JSONFrom(offset uint64, v any) error {
+	mem := FindMemory(offset)
+	return json.Unmarshal(mem.ReadBytes(), v)
+}
+
+func InputJSON(v any) error {
+	return json.Unmarshal(Input(), v)
+}
+
+func OutputJSON(v any) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	OutputMemory(AllocateBytes(b))
+	return nil
+}
+
 func Allocate(length int) Memory {
 	clength := uint64(length)
 	offset := extism_alloc(clength)

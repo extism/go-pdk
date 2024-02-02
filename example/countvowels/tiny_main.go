@@ -9,6 +9,39 @@ import (
 	"github.com/extism/go-pdk"
 )
 
+type CountVowelsInput struct {
+	Input string `json:"input"`
+}
+
+type CountVowelsOuptut struct {
+	Count  int    `json:"count"`
+	Total  int    `json:"total"`
+	Vowels string `json:"vowels"`
+}
+
+//export count_vowels_typed
+func count_vowels_typed() int32 {
+	var input CountVowelsInput
+	if err := pdk.InputJSON(&input); err != nil {
+		pdk.SetError(err)
+		return -1
+	}
+
+	pdk.OutputString(input.Input)
+	return 0
+}
+
+//export count_vowels_json_output
+func count_vowels_json_output() int32 {
+	output := CountVowelsOuptut{Count: 42, Total: 2.1e7, Vowels: "aAeEiIoOuUyY"}
+	err := pdk.OutputJSON(output)
+	if err != nil {
+		pdk.SetError(err)
+		return -1
+	}
+	return 0
+}
+
 //export count_vowels
 func count_vowels() int32 {
 	input := pdk.Input()
