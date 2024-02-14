@@ -392,3 +392,48 @@ func FindMemory(offset uint64) Memory {
 	}
 	return Memory{extismPointer(offset), length}
 }
+
+// Load bytes from Extism memory given an offset
+func ParamBytes(offset uint64) []byte {
+	mem := FindMemory(offset)
+	return mem.ReadBytes()
+}
+
+// Load string from Extism memory given an offset
+func ParamString(offset uint64) string {
+	return string(ParamBytes(offset))
+}
+
+// Load uint32 from Extism memory given an offset
+func ParamU32(offset uint64) uint32 {
+	return binary.LittleEndian.Uint32(ParamBytes(offset))
+}
+
+// Load uint64 from Extism memory given an offset
+func ParamU64(offset uint64) uint64 {
+	return binary.LittleEndian.Uint64(ParamBytes(offset))
+}
+
+// Allocate bytes and return the offset in Extism memory
+func ResultBytes(d []byte) uint64 {
+	mem := AllocateBytes(d)
+	return mem.Offset()
+}
+
+// Allocate a string and return the offset in Extism memory
+func ResultString(s string) uint64 {
+	mem := AllocateString(s)
+	return mem.Offset()
+}
+
+// Allocate a uint32 and return the offset in Extism memory
+func ResultU32(d uint32) uint64 {
+	mem := AllocateBytes(binary.LittleEndian.AppendUint32([]byte{}, d))
+	return mem.Offset()
+}
+
+// Allocate a uint64 and return the offset in Extism memory
+func ResultU64(d uint64) uint64 {
+	mem := AllocateBytes(binary.LittleEndian.AppendUint64([]byte{}, d))
+	return mem.Offset()
+}
