@@ -215,7 +215,7 @@ extism call plugin.wasm log_stuff --wasi --log-level=trace
 
 ## HTTP
 
-Sometimes it is useful to let a plug-in [make HTTP calls](https://pkg.go.dev/github.com/extism/go-pdk#HTTPRequest.Send). [See this example](example/http.go)
+Sometimes it is useful to let a plug-in [make HTTP calls](https://pkg.go.dev/github.com/extism/go-pdk#HTTPRequest.Send). [See this example](example/http/tiny_main.go)
 
 ```go
 //export http_get
