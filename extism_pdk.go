@@ -154,7 +154,6 @@ func SetErrorString(err string) {
 
 func GetConfig(key string) (string, bool) {
 	mem := AllocateBytes([]byte(key))
-	defer mem.Free()
 
 	offset := extism_config_get(mem.offset)
 	clength := extism_length(offset)
@@ -205,10 +204,8 @@ func GetVar(key string) []byte {
 
 func SetVar(key string, value []byte) {
 	keyMem := AllocateBytes([]byte(key))
-	defer keyMem.Free()
 
 	valMem := AllocateBytes(value)
-	defer valMem.Free()
 
 	extism_var_set(keyMem.offset, valMem.offset)
 }
@@ -230,13 +227,11 @@ func GetVarInt(key string) int {
 
 func SetVarInt(key string, value int) {
 	keyMem := AllocateBytes([]byte(key))
-	defer keyMem.Free()
 
 	bytes := make([]byte, 8)
 	binary.LittleEndian.PutUint64(bytes, uint64(value))
 
 	valMem := AllocateBytes(bytes)
-	defer valMem.Free()
 
 	extism_var_set(keyMem.offset, valMem.offset)
 }
