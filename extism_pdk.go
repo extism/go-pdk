@@ -92,7 +92,9 @@ func OutputJSON(v any) error {
 		return err
 	}
 
-	OutputMemory(AllocateBytes(b))
+	mem := AllocateBytes(b)
+	defer mem.Free()
+	OutputMemory(mem)
 	return nil
 }
 
@@ -149,11 +151,13 @@ func SetError(err error) {
 
 func SetErrorString(err string) {
 	mem := AllocateString(err)
+	defer mem.Free()
 	extism_error_set(mem.offset)
 }
 
 func GetConfig(key string) (string, bool) {
 	mem := AllocateBytes([]byte(key))
+	defer mem.Free()
 
 	offset := extism_config_get(mem.offset)
 	clength := extism_length(offset)
@@ -189,6 +193,7 @@ func Log(level LogLevel, s string) {
 
 func GetVar(key string) []byte {
 	mem := AllocateBytes([]byte(key))
+	defer mem.Free()
 
 	offset := extism_var_get(mem.offset)
 	clength := extism_length(offset)
@@ -204,6 +209,7 @@ func GetVar(key string) []byte {
 
 func SetVar(key string, value []byte) {
 	keyMem := AllocateBytes([]byte(key))
+	defer keyMem.Free()
 
 	valMem := AllocateBytes(value)
 
@@ -212,6 +218,7 @@ func SetVar(key string, value []byte) {
 
 func GetVarInt(key string) int {
 	mem := AllocateBytes([]byte(key))
+	defer mem.Free()
 
 	offset := extism_var_get(mem.offset)
 	clength := extism_length(offset)
@@ -227,6 +234,7 @@ func GetVarInt(key string) int {
 
 func SetVarInt(key string, value int) {
 	keyMem := AllocateBytes([]byte(key))
+	defer mem.Free()
 
 	bytes := make([]byte, 8)
 	binary.LittleEndian.PutUint64(bytes, uint64(value))
@@ -238,6 +246,7 @@ func SetVarInt(key string, value int) {
 
 func RemoveVar(key string) {
 	mem := AllocateBytes([]byte(key))
+	defer mem.Free()
 	extism_var_set(mem.offset, 0)
 }
 
