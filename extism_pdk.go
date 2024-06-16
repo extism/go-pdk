@@ -234,7 +234,7 @@ func GetVarInt(key string) int {
 
 func SetVarInt(key string, value int) {
 	keyMem := AllocateBytes([]byte(key))
-	defer mem.Free()
+	defer keyMem.Free()
 
 	bytes := make([]byte, 8)
 	binary.LittleEndian.PutUint64(bytes, uint64(value))
