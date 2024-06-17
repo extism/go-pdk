@@ -212,6 +212,7 @@ func SetVar(key string, value []byte) {
 	defer keyMem.Free()
 
 	valMem := AllocateBytes(value)
+	defer valMem.Free()
 
 	extism_var_set(keyMem.offset, valMem.offset)
 }
@@ -240,6 +241,7 @@ func SetVarInt(key string, value int) {
 	binary.LittleEndian.PutUint64(bytes, uint64(value))
 
 	valMem := AllocateBytes(bytes)
+	defer valMem.Free()
 
 	extism_var_set(keyMem.offset, valMem.offset)
 }
