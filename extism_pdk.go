@@ -143,6 +143,7 @@ func InputString() string {
 // `OutputMemory` sends the `mem` Memory to the host output.
 func OutputMemory(mem Memory) {
 	extismOutputSet(mem.offset, mem.length)
+	mem.Free()
 }
 
 // `Output` sends the `data` slice of bytes to the host output.
@@ -152,6 +153,7 @@ func Output(data []byte) {
 
 	store(offset, data)
 	extismOutputSet(offset, clength)
+	extismFree(offset)
 }
 
 // `OutputString` sends the UTF-8 string `s` to the host output.
