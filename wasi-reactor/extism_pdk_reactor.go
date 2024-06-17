@@ -1,9 +1,9 @@
 package reactor
 
 //export __wasm_call_ctors
-func __wasm_call_ctors()
+func wasmCallCtors()
 
 //export _initialize
-func _initialize() {
-	__wasm_call_ctors()
+func initialize() {
+	wasmCallCtors()
 }

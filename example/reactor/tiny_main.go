@@ -11,7 +11,7 @@ import (
 )
 
 //export read_file
-func read_file() {
+func readFile() {
 	name := pdk.InputString()
 
 	content, err := os.ReadFile(name)
