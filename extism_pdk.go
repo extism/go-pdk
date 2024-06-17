@@ -141,9 +141,9 @@ func InputString() string {
 }
 
 // `OutputMemory` sends the `mem` Memory to the host output.
+// Note that the `mem` is _NOT_ freed and is your responsibility to free when finished with it.
 func OutputMemory(mem Memory) {
 	extismOutputSet(mem.offset, mem.length)
-	mem.Free()
 }
 
 // `Output` sends the `data` slice of bytes to the host output.
