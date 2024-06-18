@@ -14,15 +14,17 @@ import (
 // `_start` via WASI. So, `main` functions should contain the plugin behavior, that the host will
 // invoke by explicitly calling `_start`.
 func main() {
-	count_vowels()
-	count_vowels_typed()
-	count_vowels_json_output()
+	countVowels()
+	countVowelsTyped()
+	countVowelsJSONOutput()
 }
 
+// CountVowelsInput represents the JSON input provided by the host.
 type CountVowelsInput struct {
 	Input string `json:"input"`
 }
 
+// CountVowelsOutput represents the JSON output sent to the host.
 type CountVowelsOuptut struct {
 	Count  int    `json:"count"`
 	Total  int    `json:"total"`
@@ -30,7 +32,7 @@ type CountVowelsOuptut struct {
 }
 
 //export count_vowels_typed
-func count_vowels_typed() int32 {
+func countVowelsTyped() int32 {
 	var input CountVowelsInput
 	if err := pdk.InputJSON(&input); err != nil {
 		pdk.SetError(err)
@@ -42,7 +44,7 @@ func count_vowels_typed() int32 {
 }
 
 //export count_vowels_json_output
-func count_vowels_json_output() int32 {
+func countVowelsJSONOutput() int32 {
 	output := CountVowelsOuptut{Count: 42, Total: 2.1e7, Vowels: "aAeEiIoOuUyY"}
 	err := pdk.OutputJSON(output)
 	if err != nil {
@@ -52,7 +54,7 @@ func count_vowels_json_output() int32 {
 	return 0
 }
 
-func count_vowels() int32 {
+func countVowels() int32 {
 	input := pdk.Input()
 
 	count := 0
