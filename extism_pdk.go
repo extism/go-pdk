@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 )
 
-// `Memory` represents memory allocated by (and shared with) the host.
+// Memory represents memory allocated by (and shared with) the host.
 type Memory struct {
 	offset extismPointer
 	length uint64
 }
 
-// `LogLevel` represents a logging level.
+// LogLevel represents a logging level.
 type LogLevel int
 
 const (
@@ -75,24 +75,24 @@ func store(offset extismPointer, buf []byte) {
 	}
 }
 
-// `Input` returns a slice of bytes from the host.
+// Input returns a slice of bytes from the host.
 func Input() []byte {
 	return loadInput()
 }
 
-// `JSONFrom` unmarshals a `Memory` block located at `offset` from the host
+// JSONFrom unmarshals a `Memory` block located at `offset` from the host
 // into the provided data `v`.
 func JSONFrom(offset uint64, v any) error {
 	mem := FindMemory(offset)
 	return json.Unmarshal(mem.ReadBytes(), v)
 }
 
-// `InputJSON` returns unmartialed JSON data from the host "input".
+// InputJSON returns unmartialed JSON data from the host "input".
 func InputJSON(v any) error {
 	return json.Unmarshal(Input(), v)
 }
 
-// `OutputJSON` marshals the provided data `v` as output to the host.
+// OutputJSON marshals the provided data `v` as output to the host.
 func OutputJSON(v any) error {
 	b, err := json.Marshal(v)
 	if err != nil {
@@ -105,7 +105,7 @@ func OutputJSON(v any) error {
 	return nil
 }
 
-// `Allocate` allocates `length` uninitialized bytes on the host.
+// Allocate allocates `length` uninitialized bytes on the host.
 func Allocate(length int) Memory {
 	clength := uint64(length)
 	offset := extismAlloc(clength)
@@ -116,7 +116,7 @@ func Allocate(length int) Memory {
 	}
 }
 
-// `AllocateBytes` allocates and saves the `data` into Memory on the host.
+// AllocateBytes allocates and saves the `data` into Memory on the host.
 func AllocateBytes(data []byte) Memory {
 	clength := uint64(len(data))
 	offset := extismAlloc(clength)
@@ -130,23 +130,23 @@ func AllocateBytes(data []byte) Memory {
 
 }
 
-// `AllocateString` allocates and saves the UTF-8 string `data` into Memory on the host.
+// AllocateString allocates and saves the UTF-8 string `data` into Memory on the host.
 func AllocateString(data string) Memory {
 	return AllocateBytes([]byte(data))
 }
 
-// `InputString` returns the input data from the host as a UTF-8 string.
+// InputString returns the input data from the host as a UTF-8 string.
 func InputString() string {
 	return string(Input())
 }
 
-// `OutputMemory` sends the `mem` Memory to the host output.
+// OutputMemory sends the `mem` Memory to the host output.
 // Note that the `mem` is _NOT_ freed and is your responsibility to free when finished with it.
 func OutputMemory(mem Memory) {
 	extismOutputSet(mem.offset, mem.length)
 }
 
-// `Output` sends the `data` slice of bytes to the host output.
+// Output sends the `data` slice of bytes to the host output.
 func Output(data []byte) {
 	clength := uint64(len(data))
 	offset := extismAlloc(clength)
@@ -156,24 +156,24 @@ func Output(data []byte) {
 	extismFree(offset)
 }
 
-// `OutputString` sends the UTF-8 string `s` to the host output.
+// OutputString sends the UTF-8 string `s` to the host output.
 func OutputString(s string) {
 	Output([]byte(s))
 }
 
-// `SetError` sets the host error string from `err`.
+// SetError sets the host error string from `err`.
 func SetError(err error) {
 	SetErrorString(err.Error())
 }
 
-// `SetErrorString` sets the host error string from `err`.
+// SetErrorString sets the host error string from `err`.
 func SetErrorString(err string) {
 	mem := AllocateString(err)
 	defer mem.Free()
 	extismErrorSet(mem.offset)
 }
 
-// `GetConfig` returns the config string associated with `key` (if any).
+// GetConfig returns the config string associated with `key` (if any).
 func GetConfig(key string) (string, bool) {
 	mem := AllocateBytes([]byte(key))
 	defer mem.Free()
@@ -190,7 +190,7 @@ func GetConfig(key string) (string, bool) {
 	return string(value), true
 }
 
-// `LogMemory` logs the `memory` block on the host using the provided log `level`.
+// LogMemory logs the `memory` block on the host using the provided log `level`.
 func LogMemory(level LogLevel, memory Memory) {
 	switch level {
 	case LogInfo:
@@ -204,7 +204,7 @@ func LogMemory(level LogLevel, memory Memory) {
 	}
 }
 
-// `Log` logs the provided UTF-8 string `s` on the host using the provided log `level`.
+// Log logs the provided UTF-8 string `s` on the host using the provided log `level`.
 func Log(level LogLevel, s string) {
 	mem := AllocateString(s)
 	defer mem.Free()
@@ -212,7 +212,7 @@ func Log(level LogLevel, s string) {
 	LogMemory(level, mem)
 }
 
-// `GetVar` returns the byte slice (if any) associated with `key`.
+// GetVar returns the byte slice (if any) associated with `key`.
 func GetVar(key string) []byte {
 	mem := AllocateBytes([]byte(key))
 	defer mem.Free()
@@ -229,7 +229,7 @@ func GetVar(key string) []byte {
 	return value
 }
 
-// `SetVar` sets the host variable associated with `key` to the `value` byte slice.
+// SetVar sets the host variable associated with `key` to the `value` byte slice.
 func SetVar(key string, value []byte) {
 	keyMem := AllocateBytes([]byte(key))
 	defer keyMem.Free()
@@ -240,7 +240,7 @@ func SetVar(key string, value []byte) {
 	extismVarSet(keyMem.offset, valMem.offset)
 }
 
-// `GetVarInt` returns the int associated with `key` (or 0 if none).
+// GetVarInt returns the int associated with `key` (or 0 if none).
 func GetVarInt(key string) int {
 	mem := AllocateBytes([]byte(key))
 	defer mem.Free()
@@ -257,7 +257,7 @@ func GetVarInt(key string) int {
 	return int(binary.LittleEndian.Uint64(value))
 }
 
-// `SetVarInt` sets the host variable associated with `key` to the `value` int.
+// SetVarInt sets the host variable associated with `key` to the `value` int.
 func SetVarInt(key string, value int) {
 	keyMem := AllocateBytes([]byte(key))
 	defer keyMem.Free()
@@ -271,38 +271,38 @@ func SetVarInt(key string, value int) {
 	extismVarSet(keyMem.offset, valMem.offset)
 }
 
-// `RemoveVar` removes (and frees) the host variable associated with `key`.
+// RemoveVar removes (and frees) the host variable associated with `key`.
 func RemoveVar(key string) {
 	mem := AllocateBytes([]byte(key))
 	defer mem.Free()
 	extismVarSet(mem.offset, 0)
 }
 
-// `HTTPRequestMeta` represents the metadata associated with an HTTP request on the host.
+// HTTPRequestMeta represents the metadata associated with an HTTP request on the host.
 type HTTPRequestMeta struct {
 	URL     string            `json:"url"`
 	Method  string            `json:"method"`
 	Headers map[string]string `json:"headers"`
 }
 
-// `HTTPRequest` represents an HTTP request sent by the host.
+// HTTPRequest represents an HTTP request sent by the host.
 type HTTPRequest struct {
 	meta HTTPRequestMeta
 	body []byte
 }
 
-// `HTTPResponse` represents an HTTP response returned from the host.
+// HTTPResponse represents an HTTP response returned from the host.
 type HTTPResponse struct {
 	memory Memory
 	status uint16
 }
 
-// `Memory` returns the memory associated with the `HTTPResponse`.
+// Memory returns the memory associated with the `HTTPResponse`.
 func (r HTTPResponse) Memory() Memory {
 	return r.memory
 }
 
-// `Memory` returns the body byte slice (if any) from the `HTTPResponse`.
+// Body returns the body byte slice (if any) from the `HTTPResponse`.
 func (r HTTPResponse) Body() []byte {
 	if r.memory.length == 0 {
 		return nil
@@ -313,12 +313,12 @@ func (r HTTPResponse) Body() []byte {
 	return buf
 }
 
-// `Status` returns the status code from the `HTTPResponse`.
+// Status returns the status code from the `HTTPResponse`.
 func (r HTTPResponse) Status() uint16 {
 	return r.status
 }
 
-// `HTTPMethod` represents an HTTP method.
+// HTTPMethod represents an HTTP method.
 type HTTPMethod int32
 
 const (
@@ -358,7 +358,7 @@ func (m HTTPMethod) String() string {
 	}
 }
 
-// `NewHTTPRequest` returns a new `HTTPRequest`.
+// NewHTTPRequest returns a new `HTTPRequest`.
 func NewHTTPRequest(method HTTPMethod, url string) *HTTPRequest {
 	return &HTTPRequest{
 		meta: HTTPRequestMeta{
@@ -370,7 +370,7 @@ func NewHTTPRequest(method HTTPMethod, url string) *HTTPRequest {
 	}
 }
 
-// `SetHeader` sets an HTTP header `key` to `value`.
+// SetHeader sets an HTTP header `key` to `value`.
 func (r *HTTPRequest) SetHeader(key string, value string) *HTTPRequest {
 	if r.meta.Headers == nil {
 		r.meta.Headers = make(map[string]string)
@@ -379,13 +379,13 @@ func (r *HTTPRequest) SetHeader(key string, value string) *HTTPRequest {
 	return r
 }
 
-// `SetBody` sets an HTTP request body to the provided byte slice.
+// SetBody sets an HTTP request body to the provided byte slice.
 func (r *HTTPRequest) SetBody(body []byte) *HTTPRequest {
 	r.body = body
 	return r
 }
 
-// `Send` sends the `HTTPRequest` from the host and returns the `HTTPResponse`.
+// Send sends the `HTTPRequest` from the host and returns the `HTTPResponse`.
 func (r *HTTPRequest) Send() HTTPResponse {
 	enc, _ := json.Marshal(r.meta)
 
@@ -410,39 +410,39 @@ func (r *HTTPRequest) Send() HTTPResponse {
 	}
 }
 
-// `ReadBytes` returns the host memory block as a slice of bytes.
+// ReadBytes returns the host memory block as a slice of bytes.
 func (m *Memory) ReadBytes() []byte {
 	buff := make([]byte, m.length)
 	m.Load(buff)
 	return buff
 }
 
-// `Load` copies the host memory block to the provided `buffer` byte slice.
+// Load copies the host memory block to the provided `buffer` byte slice.
 func (m *Memory) Load(buffer []byte) {
 	load(m.offset, buffer)
 }
 
-// `Store` copies the `data` byte slice into host memory.
+// Store copies the `data` byte slice into host memory.
 func (m *Memory) Store(data []byte) {
 	store(m.offset, data)
 }
 
-// `Free` frees the host memory block.
+// Free frees the host memory block.
 func (m *Memory) Free() {
 	extismFree(m.offset)
 }
 
-// `Length` returns the number of bytes in the host memory block.
+// Length returns the number of bytes in the host memory block.
 func (m *Memory) Length() uint64 {
 	return m.length
 }
 
-// `Offset` returns the offset of the host memory block.
+// Offset returns the offset of the host memory block.
 func (m *Memory) Offset() uint64 {
 	return uint64(m.offset)
 }
 
-// `FindMemory` finds the host memory block at the given `offset`.
+// FindMemory finds the host memory block at the given `offset`.
 func FindMemory(offset uint64) Memory {
 	length := extismLength(extismPointer(offset))
 	if length == 0 {
@@ -451,46 +451,46 @@ func FindMemory(offset uint64) Memory {
 	return Memory{extismPointer(offset), length}
 }
 
-// `ParamBytes` returns bytes from Extism host memory given an offset.
+// ParamBytes returns bytes from Extism host memory given an offset.
 func ParamBytes(offset uint64) []byte {
 	mem := FindMemory(offset)
 	return mem.ReadBytes()
 }
 
-// `ParamString` returns UTF-8 string data from Extism host memory given an offset.
+// ParamString returns UTF-8 string data from Extism host memory given an offset.
 func ParamString(offset uint64) string {
 	return string(ParamBytes(offset))
 }
 
-// `ParamU32` returns a uint32 from Extism host memory given an offset.
+// ParamU32 returns a uint32 from Extism host memory given an offset.
 func ParamU32(offset uint64) uint32 {
 	return binary.LittleEndian.Uint32(ParamBytes(offset))
 }
 
-// `ParamU64` returns a uint64 from Extism host memory given an offset.
+// ParamU64 returns a uint64 from Extism host memory given an offset.
 func ParamU64(offset uint64) uint64 {
 	return binary.LittleEndian.Uint64(ParamBytes(offset))
 }
 
-// `ResultBytes` allocates bytes and returns the offset in Extism host memory.
+// ResultBytes allocates bytes and returns the offset in Extism host memory.
 func ResultBytes(d []byte) uint64 {
 	mem := AllocateBytes(d)
 	return mem.Offset()
 }
 
-// `ResultString` allocates a UTF-8 string and returns the offset in Extism host memory.
+// ResultString allocates a UTF-8 string and returns the offset in Extism host memory.
 func ResultString(s string) uint64 {
 	mem := AllocateString(s)
 	return mem.Offset()
 }
 
-// `ResultU32` allocates a uint32 and returns the offset in Extism host memory.
+// ResultU32 allocates a uint32 and returns the offset in Extism host memory.
 func ResultU32(d uint32) uint64 {
 	mem := AllocateBytes(binary.LittleEndian.AppendUint32([]byte{}, d))
 	return mem.Offset()
 }
 
-// `ResultU64` allocates a uint64 and returns the offset in Extism host memory.
+// ResultU64 allocates a uint64 and returns the offset in Extism host memory.
 func ResultU64(d uint64) uint64 {
 	mem := AllocateBytes(binary.LittleEndian.AppendUint64([]byte{}, d))
 	return mem.Offset()
