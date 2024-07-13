@@ -193,9 +193,8 @@ Extism provides a simple [logging function](https://pkg.go.dev/github.com/extism
 func logStuff() int32 {
 	pdk.Log(pdk.LogInfo, "An info log!")
 	pdk.Log(pdk.LogDebug, "A debug log!")
-	pdk.Log(pdk.LogWarn, "A trace log!")
+	pdk.Log(pdk.LogWarn, "A warn log!")
 	pdk.Log(pdk.LogError, "An error log!")
-	pdk.Log(pdk.LogTrace, "A trace log!")
 	return 0
 }
 ```
@@ -203,11 +202,11 @@ func logStuff() int32 {
 From [Extism CLI](https://github.com/extism/cli):
 
 ```bash
-extism call plugin.wasm log_stuff --wasi --log-level=trace
+extism call plugin.wasm log_stuff --wasi --log-level=debug
 2023/10/12 12:11:23 Calling function : log_stuff
 2023/10/12 12:11:23 An info log!
 2023/10/12 12:11:23 A debug log!
-2023/10/12 12:11:23 A trace log!
+2023/10/12 12:11:23 A warn log!
 2023/10/12 12:11:23 An error log!
 ```
 

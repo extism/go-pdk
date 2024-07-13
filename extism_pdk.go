@@ -19,7 +19,6 @@ const (
 	LogDebug
 	LogWarn
 	LogError
-	LogTrace
 )
 
 func load(offset extismPointer, buf []byte) {
