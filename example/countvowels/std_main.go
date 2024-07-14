@@ -17,6 +17,7 @@ func main() {
 	countVowels()
 	countVowelsTyped()
 	countVowelsJSONOutput()
+	countVowelsJSONRoundtripMem()
 }
 
 // CountVowelsInput represents the JSON input provided by the host.
@@ -51,6 +52,32 @@ func countVowelsJSONOutput() int32 {
 		pdk.SetError(err)
 		return -1
 	}
+	return 0
+}
+
+//export count_vowels_roundtrip_json_mem
+func countVowelsJSONRoundtripMem() int32 {
+	a := CountVowelsOuptut{Count: 42, Total: 2.1e7, Vowels: "aAeEiIoOuUyY"}
+	mem, err := pdk.AllocateJSON(&a)
+	if err != nil {
+		pdk.SetError(err)
+		return -1
+	}
+
+	// find the data in mem and ensure it's the same once decoded
+	var b CountVowelsOuptut
+	err = pdk.JSONFrom(mem.Offset(), &b)
+	if err != nil {
+		pdk.SetError(err)
+		return -1
+	}
+
+	if a.Count != b.Count || a.Total != b.Total || a.Vowels != b.Vowels {
+		pdk.SetErrorString("roundtrip JSON failed")
+		return -1
+	}
+
+	pdk.OutputString("JSON roundtrip: a === b")
 	return 0
 }
 
