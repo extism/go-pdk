@@ -134,6 +134,16 @@ func AllocateString(data string) Memory {
 	return AllocateBytes([]byte(data))
 }
 
+// AllocateJSON allocates and saves the type `any` into Memory on the host.
+func AllocateJSON(v any) (Memory, error) {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return Memory{}, err
+	}
+
+	return AllocateBytes(b), nil
+}
+
 // InputString returns the input data from the host as a UTF-8 string.
 func InputString() string {
 	return string(Input())
