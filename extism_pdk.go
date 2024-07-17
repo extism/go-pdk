@@ -99,7 +99,8 @@ func OutputJSON(v any) error {
 	}
 
 	mem := AllocateBytes(b)
-	defer mem.Free()
+	// TODO: coordinate replacement of call to free based on SDK alignment
+	// defer mem.Free()
 	OutputMemory(mem)
 	return nil
 }
@@ -178,7 +179,8 @@ func SetError(err error) {
 // SetErrorString sets the host error string from `err`.
 func SetErrorString(err string) {
 	mem := AllocateString(err)
-	defer mem.Free()
+	// TODO: coordinate replacement of call to free based on SDK alignment
+	// defer mem.Free()
 	extismErrorSet(mem.offset)
 }
 
@@ -216,7 +218,8 @@ func LogMemory(level LogLevel, memory Memory) {
 // Log logs the provided UTF-8 string `s` on the host using the provided log `level`.
 func Log(level LogLevel, s string) {
 	mem := AllocateString(s)
-	defer mem.Free()
+	// TODO: coordinate replacement of call to free based on SDK alignment
+	// defer mem.Free()
 
 	LogMemory(level, mem)
 }
@@ -241,10 +244,12 @@ func GetVar(key string) []byte {
 // SetVar sets the host variable associated with `key` to the `value` byte slice.
 func SetVar(key string, value []byte) {
 	keyMem := AllocateBytes([]byte(key))
-	defer keyMem.Free()
+	// TODO: coordinate replacement of call to free based on SDK alignment
+	// defer keyMem.Free()
 
 	valMem := AllocateBytes(value)
-	defer valMem.Free()
+	// TODO: coordinate replacement of call to free based on SDK alignment
+	// defer valMem.Free()
 
 	extismVarSet(keyMem.offset, valMem.offset)
 }
@@ -269,13 +274,15 @@ func GetVarInt(key string) int {
 // SetVarInt sets the host variable associated with `key` to the `value` int.
 func SetVarInt(key string, value int) {
 	keyMem := AllocateBytes([]byte(key))
-	defer keyMem.Free()
+	// TODO: coordinate replacement of call to free based on SDK alignment
+	// defer keyMem.Free()
 
 	bytes := make([]byte, 8)
 	binary.LittleEndian.PutUint64(bytes, uint64(value))
 
 	valMem := AllocateBytes(bytes)
-	defer valMem.Free()
+	// TODO: coordinate replacement of call to free based on SDK alignment
+	// defer valMem.Free()
 
 	extismVarSet(keyMem.offset, valMem.offset)
 }
@@ -283,7 +290,8 @@ func SetVarInt(key string, value int) {
 // RemoveVar removes (and frees) the host variable associated with `key`.
 func RemoveVar(key string) {
 	mem := AllocateBytes([]byte(key))
-	defer mem.Free()
+	// TODO: coordinate replacement of call to free based on SDK alignment
+	// defer mem.Free()
 	extismVarSet(mem.offset, 0)
 }
 
