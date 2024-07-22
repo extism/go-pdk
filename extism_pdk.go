@@ -163,7 +163,8 @@ func Output(data []byte) {
 
 	store(offset, data)
 	extismOutputSet(offset, clength)
-	extismFree(offset)
+	// TODO: coordinate replacement of call to free based on SDK alignment
+	// extismFree(offset)
 }
 
 // OutputString sends the UTF-8 string `s` to the host output.
