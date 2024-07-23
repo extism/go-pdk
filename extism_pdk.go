@@ -18,12 +18,12 @@ const (
 	LogTrace
 )
 
-func makeHandle(data *[]byte) extismHandle {
-	if data == nil || *data == nil {
+func makeHandle(data []byte) extismHandle {
+	if data == nil {
 		return 0
 	}
-	ptr := uint64(uintptr(unsafe.Pointer(&(*data)[0])))
-	len := uint64(len(*data))
+	ptr := uint64(uintptr(unsafe.Pointer(&data[0])))
+	len := uint64(len(data))
 	return extismHandle((ptr << 32) | (len & uint64(0xffffffff)))
 }
 
@@ -38,7 +38,7 @@ func Input() []byte {
 	buffer := make([]byte, 1024)
 	data := bytes.NewBuffer([]byte{})
 	for {
-		n := extismRead(extismStreamInput, makeHandle(&buffer))
+		n := extismRead(extismStreamInput, makeHandle(buffer))
 		if n <= 0 {
 			break
 		}
@@ -71,7 +71,7 @@ func InputString() string {
 
 // Output sends the `data` slice of bytes to the host output.
 func Output(data []byte) {
-	extismWrite(extismStreamOutput, makeHandle(&data))
+	extismWrite(extismStreamOutput, makeHandle(data))
 }
 
 // OutputString sends the UTF-8 string `s` to the host output.
@@ -87,26 +87,26 @@ func Error(err error) {
 // ErrorString sets the host error string from `err`.
 func ErrorString(err string) {
 	data := []byte(err)
-	extismError(makeHandle(&data))
+	extismError(makeHandle(data))
 }
 
 // GetConfig returns the config string associated with `key` (if any).
 func GetConfig(key string) (string, bool) {
 	keyData := []byte(key)
-	keyHandle := makeHandle(&keyData)
+	keyHandle := makeHandle(keyData)
 	length := extismConfigLength(keyHandle)
 	if length < 0 {
 		return "", false
 	}
 	buf := make([]byte, length)
-	extismConfigRead(keyHandle, makeHandle(&buf))
+	extismConfigRead(keyHandle, makeHandle(buf))
 	return string(buf), true
 }
 
 // LogMemory logs the `memory` block on the host using the provided log `level`.
 func Log(level LogLevel, s string) {
 	data := []byte(s)
-	extismLog(level, makeHandle(&data))
+	extismLog(level, makeHandle(data))
 }
 
 var vars = map[string][]byte{}
@@ -176,7 +176,7 @@ func (r HTTPResponse) Body() []byte {
 	buf := make([]byte, 1024)
 	out := bytes.NewBuffer([]byte{})
 	for {
-		n := extismHTTPBody(makeHandle(&buf))
+		n := extismHTTPBody(makeHandle(buf))
 		if n < 0 {
 			break
 		}
@@ -261,7 +261,7 @@ func (r *HTTPRequest) SetBody(body []byte) *HTTPRequest {
 func (r *HTTPRequest) Send() HTTPResponse {
 	enc, _ := json.Marshal(r.meta)
 
-	length := int(extismHTTPRequest(makeHandle(&enc), makeHandle(&r.body)))
+	length := int(extismHTTPRequest(makeHandle(enc), makeHandle(r.body)))
 	status := uint16(extismHTTPStatusCode())
 
 	return HTTPResponse{
