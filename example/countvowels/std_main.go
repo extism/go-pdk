@@ -17,7 +17,6 @@ func main() {
 	countVowels()
 	countVowelsTyped()
 	countVowelsJSONOutput()
-	countVowelsJSONRoundtripMem()
 }
 
 // CountVowelsInput represents the JSON input provided by the host.
@@ -33,55 +32,25 @@ type CountVowelsOuptut struct {
 }
 
 //export count_vowels_typed
-func countVowelsTyped() int32 {
+func countVowelsTyped() {
 	var input CountVowelsInput
 	if err := pdk.InputJSON(&input); err != nil {
-		pdk.SetError(err)
-		return -1
+		pdk.Error(err)
 	}
 
 	pdk.OutputString(input.Input)
-	return 0
 }
 
 //export count_vowels_json_output
-func countVowelsJSONOutput() int32 {
+func countVowelsJSONOutput() {
 	output := CountVowelsOuptut{Count: 42, Total: 2.1e7, Vowels: "aAeEiIoOuUyY"}
 	err := pdk.OutputJSON(output)
 	if err != nil {
-		pdk.SetError(err)
-		return -1
+		pdk.Error(err)
 	}
-	return 0
 }
 
-//export count_vowels_roundtrip_json_mem
-func countVowelsJSONRoundtripMem() int32 {
-	a := CountVowelsOuptut{Count: 42, Total: 2.1e7, Vowels: "aAeEiIoOuUyY"}
-	mem, err := pdk.AllocateJSON(&a)
-	if err != nil {
-		pdk.SetError(err)
-		return -1
-	}
-
-	// find the data in mem and ensure it's the same once decoded
-	var b CountVowelsOuptut
-	err = pdk.JSONFrom(mem.Offset(), &b)
-	if err != nil {
-		pdk.SetError(err)
-		return -1
-	}
-
-	if a.Count != b.Count || a.Total != b.Total || a.Vowels != b.Vowels {
-		pdk.SetErrorString("roundtrip JSON failed")
-		return -1
-	}
-
-	pdk.OutputString("JSON roundtrip: a === b")
-	return 0
-}
-
-func countVowels() int32 {
+func countVowels() {
 	input := pdk.Input()
 
 	count := 0
@@ -94,10 +63,10 @@ func countVowels() int32 {
 	}
 
 	// test some extra pdk functionality
-	if pdk.GetVar("a") == nil {
+	if _, ok := pdk.GetVar("a"); !ok {
 		pdk.SetVar("a", []byte("this is var a"))
 	}
-	varA := pdk.GetVar("a")
+	varA, _ := pdk.GetVar("a")
 	thing, ok := pdk.GetConfig("thing")
 
 	if !ok {
@@ -105,10 +74,6 @@ func countVowels() int32 {
 	}
 
 	output := `{"count": ` + strconv.Itoa(count) + `, "config": "` + thing + `", "a": "` + string(varA) + `"}`
-	mem := pdk.AllocateString(output)
 
-	// zero-copy output to host
-	pdk.OutputMemory(mem)
-
-	return 0
+	pdk.OutputString(output)
 }

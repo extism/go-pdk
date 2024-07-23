@@ -22,8 +22,7 @@ func httpGet() int32 {
 	// send the request, get response back (can check status on response via res.Status())
 	res := req.Send()
 
-	// zero-copy output to host
-	pdk.OutputMemory(res.Memory())
+	pdk.Output(res.Body())
 
 	return 0
 }
