@@ -33,6 +33,10 @@ func splitHandle(handle extismHandle) (uint32, uint32) {
 	return uint32(ptr), uint32(len)
 }
 
+func InputLength() int {
+	return int(extismBytesRemaining(extismStreamInput))
+}
+
 // Input returns a slice of bytes from the host.
 func Input() []byte {
 	buffer := make([]byte, 1024)

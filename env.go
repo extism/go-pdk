@@ -20,6 +20,9 @@ func extismWrite(stream extismStream, buf extismHandle) int64
 //go:wasmimport extism:host/env close
 func extismClose(stream extismStream)
 
+//go:wasmimport extism:host/env bytes_remaining
+func extismBytesRemaining(stream extismStream) int64
+
 //go:wasmimport extism:host/env stack_push
 func extismStackPush()
 
