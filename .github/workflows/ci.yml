@@ -15,7 +15,8 @@ jobs:
         with:
           path: go-pdk
       - uses: ./go-pdk/.github/actions/libextism
-
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - run: cp go-pdk/go.sum . # Needed to get setup-go to work
 
       - name: Install Go
