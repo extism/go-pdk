@@ -2,6 +2,11 @@ on: [workflow_call]
 
 name: libextism
 
+inputs:
+  token:
+    description: 'A Github PAT'
+    required: true
+
 runs:
   using: composite
   steps:
@@ -12,4 +17,4 @@ runs:
     - uses: ./.extism-cli/.github/actions/extism-cli
     - name: Install
       shell: bash
-      run: sudo extism lib install --version git
+      run: sudo extism lib install --version git --github-token "${{ inputs.token }}"
