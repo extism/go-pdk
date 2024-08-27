@@ -120,6 +120,17 @@ func extismHTTPRequest(request, body extismPointer) extismPointer
 //go:wasmimport extism:host/env http_status_code
 func extismHTTPStatusCode() int32
 
+// extismGetLogLevel returns the current log level set in the Extism runtime.
+//
+//go:wasmimport extism:host/env get_log_level
+func extismGetLogLevel() int32
+
+// extismLogTrace logs a "trace" string to the host from the previously-written UTF-8 string written to `offset`.
+// Note that the memory at `offset` can be immediately freed because it is immediately logged.
+//
+//go:wasmimport extism:host/env log_trace
+func extismLogTrace(offset extismPointer)
+
 // extismLogInfo logs an "info" string to the host from the previously-written UTF-8 string written to `offset`.
 // Note that the memory at `offset` can be immediately freed because it is immediately logged.
 //

@@ -3,6 +3,7 @@ package pdk
 import (
 	"encoding/binary"
 	"encoding/json"
+	"math"
 )
 
 // Memory represents memory allocated by (and shared with) the host.
@@ -12,14 +13,16 @@ type Memory struct {
 }
 
 // LogLevel represents a logging level.
-type LogLevel int
+type LogLevel int32
 
 const (
-	LogInfo LogLevel = iota
+	LogTrace LogLevel = iota
 	LogDebug
+	LogInfo
 	LogWarn
 	LogError
-	LogTrace
+
+	LogOff LogLevel = math.MaxInt32
 )
 
 func load(offset extismPointer, buf []byte) {
@@ -205,25 +208,38 @@ func GetConfig(key string) (string, bool) {
 
 // LogMemory logs the `memory` block on the host using the provided log `level`.
 func LogMemory(level LogLevel, memory Memory) {
-	switch level {
-	case LogInfo:
-		extismLogInfo(memory.offset)
-	case LogDebug:
-		extismLogDebug(memory.offset)
-	case LogWarn:
-		extismLogWarn(memory.offset)
-	case LogError:
-		extismLogError(memory.offset)
+	globalLogLevel := LogLevel(extismGetLogLevel())
+	if level < globalLogLevel {
+		return
 	}
+
+	logMemory(level, memory)
 }
 
-// Log logs the provided UTF-8 string `s` on the host using the provided log `level`.
-func Log(level LogLevel, s string) {
-	mem := AllocateString(s)
-	// TODO: coordinate replacement of call to free based on SDK alignment
-	// defer mem.Free()
+// Log logs a message at the specified log level, but only if the current log level is high enough.
+func Log(level LogLevel, message string) {
+	globalLogLevel := LogLevel(extismGetLogLevel())
+	if level < globalLogLevel {
+		return
+	}
 
-	LogMemory(level, mem)
+	mem := AllocateString(message)
+	logMemory(level, mem)
+}
+
+func logMemory(level LogLevel, mem Memory) {
+	switch level {
+	case LogTrace:
+		extismLogTrace(mem.offset)
+	case LogDebug:
+		extismLogDebug(mem.offset)
+	case LogInfo:
+		extismLogInfo(mem.offset)
+	case LogWarn:
+		extismLogWarn(mem.offset)
+	case LogError:
+		extismLogError(mem.offset)
+	}
 }
 
 // GetVar returns the byte slice (if any) associated with `key`.
