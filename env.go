@@ -120,6 +120,11 @@ func extismHTTPRequest(request, body extismPointer) extismPointer
 //go:wasmimport extism:host/env http_status_code
 func extismHTTPStatusCode() int32
 
+// extismHTTPHeaders returns the response headers for the last-sent `extism_http_request` call.
+//
+//go:wasmimport extism:host/env http_headers
+func extismHTTPHeaders() extismPointer
+
 // extismLogInfo logs an "info" string to the host from the previously-written UTF-8 string written to `offset`.
 // Note that the memory at `offset` can be immediately freed because it is immediately logged.
 //

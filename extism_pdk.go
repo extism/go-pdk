@@ -312,8 +312,9 @@ type HTTPRequest struct {
 
 // HTTPResponse represents an HTTP response returned from the host.
 type HTTPResponse struct {
-	memory Memory
-	status uint16
+	memory  Memory
+	status  uint16
+	headers map[string]string
 }
 
 // Memory returns the memory associated with the `HTTPResponse`.
@@ -335,6 +336,11 @@ func (r HTTPResponse) Body() []byte {
 // Status returns the status code from the `HTTPResponse`.
 func (r HTTPResponse) Status() uint16 {
 	return r.status
+}
+
+// Headers returns a map containing the HTTP response headers
+func (r *HTTPResponse) Headers() map[string]string {
+	return r.headers
 }
 
 // HTTPMethod represents an HTTP method.
@@ -421,11 +427,22 @@ func (r *HTTPRequest) Send() HTTPResponse {
 	length := extismLengthUnsafe(offset)
 	status := uint16(extismHTTPStatusCode())
 
+	headersOffs := extismHTTPHeaders()
+	headers := map[string]string{}
+
+	if headersOffs != 0 {
+		length := extismLengthUnsafe(headersOffs)
+		mem := Memory{offset: headersOffs, length: length}
+		defer mem.Free()
+		json.Unmarshal(mem.ReadBytes(), &headers)
+	}
+
 	memory := Memory{offset, length}
 
 	return HTTPResponse{
 		memory,
 		status,
+		headers,
 	}
 }
 
