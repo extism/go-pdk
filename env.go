@@ -121,25 +121,31 @@ func extismHTTPRequest(request, body extismPointer) extismPointer
 func extismHTTPStatusCode() int32
 
 // extismLogInfo logs an "info" string to the host from the previously-written UTF-8 string written to `offset`.
-// Note that the memory at `offset` can be immediately freed because it is immediately logged.
 //
 //go:wasmimport extism:host/env log_info
 func extismLogInfo(offset extismPointer)
 
 // extismLogDebug logs a "debug" string to the host from the previously-written UTF-8 string written to `offset`.
-// Note that the memory at `offset` can be immediately freed because it is immediately logged.
 //
 //go:wasmimport extism:host/env log_debug
 func extismLogDebug(offset extismPointer)
 
 // extismLogWarn logs a "warning" string to the host from the previously-written UTF-8 string written to `offset`.
-// Note that the memory at `offset` can be immediately freed because it is immediately logged.
 //
 //go:wasmimport extism:host/env log_warn
 func extismLogWarn(offset extismPointer)
 
 // extismLogError logs an "error" string to the host from the previously-written UTF-8 string written to `offset`.
-// Note that the memory at `offset` can be immediately freed because it is immediately logged.
 //
 //go:wasmimport extism:host/env log_error
 func extismLogError(offset extismPointer)
+
+// extismLogTrace logs an "error" string to the host from the previously-written UTF-8 string written to `offset`.
+//
+//go:wasmimport extism:host/env log_error
+func extismLogTrace(offset extismPointer)
+
+// extismGetLogLevel returns the configured log level
+//
+//go:wasmimport extism:host/env get_log_level
+func extismGetLogLevel() int32
