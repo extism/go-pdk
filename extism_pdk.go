@@ -15,11 +15,11 @@ type Memory struct {
 type LogLevel int
 
 const (
-	LogInfo LogLevel = iota
+	LogTrace LogLevel = iota
 	LogDebug
+	LogInfo
 	LogWarn
 	LogError
-	LogTrace
 )
 
 func load(offset extismPointer, buf []byte) {
@@ -205,6 +205,10 @@ func GetConfig(key string) (string, bool) {
 
 // LogMemory logs the `memory` block on the host using the provided log `level`.
 func LogMemory(level LogLevel, memory Memory) {
+	configuredLevel := extismGetLogLevel()
+	if level < LogLevel(configuredLevel) {
+		return
+	}
 	switch level {
 	case LogInfo:
 		extismLogInfo(memory.offset)
@@ -214,6 +218,8 @@ func LogMemory(level LogLevel, memory Memory) {
 		extismLogWarn(memory.offset)
 	case LogError:
 		extismLogError(memory.offset)
+	case LogTrace:
+		extismLogTrace(memory.offset)
 	}
 }
 
