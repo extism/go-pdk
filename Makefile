@@ -14,5 +14,5 @@ test:
 	extism call example/tiny_countvowels.wasm count_vowels_roundtrip_json_mem --wasi 
 
 	extism call example/std_countvowels.wasm _start     --wasi --input "this is a test" --set-config '{"thing": "1234"}'
-	extism call example/std_http.wasm        http_get     --wasi --log-level info --allow-host "jsonplaceholder.typicode.com"
+	extism call example/std_http.wasm        _start     --wasi --log-level info --allow-host "jsonplaceholder.typicode.com"
 
