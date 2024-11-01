@@ -7,10 +7,9 @@ import (
 	"os"
 
 	"github.com/extism/go-pdk"
-	_ "github.com/extism/go-pdk/wasi-reactor"
 )
 
-//export read_file
+//go:wasmexport read_file
 func readFile() {
 	name := pdk.InputString()
 
@@ -22,5 +21,3 @@ func readFile() {
 
 	pdk.Output(content)
 }
-
-func main() {}

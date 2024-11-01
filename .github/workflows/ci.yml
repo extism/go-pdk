@@ -28,7 +28,7 @@ jobs:
       - name: Install TinyGo
         uses: acifani/setup-tinygo@v1.1.0
         with:
-          tinygo-version: 0.33.0
+          tinygo-version: 0.34.0
           binaryen-version: "116"
 
       - name: Compile example

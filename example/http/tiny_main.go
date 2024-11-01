@@ -22,4 +22,3 @@ func httpGet() int32 {
 	return 0
 }
 
-func main() {}
