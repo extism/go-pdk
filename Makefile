@@ -1,8 +1,8 @@
 .PHONY: example
 example:
-	tinygo build -o example/tiny_countvowels.wasm -target wasi ./example/countvowels
-	tinygo build -o example/tiny_http.wasm        -target wasi ./example/http
-	tinygo build -o example/tiny_reactor.wasm     -target wasi ./example/reactor
+	tinygo build -o example/tiny_countvowels.wasm -target wasi -buildmode c-shared ./example/countvowels
+	tinygo build -o example/tiny_http.wasm        -target wasi -buildmode c-shared ./example/http
+	tinygo build -o example/tiny_reactor.wasm     -target wasi -buildmode c-shared ./example/reactor
 
 	GOOS=wasip1 GOARCH=wasm go build -tags std -o example/std_countvowels.wasm ./example/countvowels
 	GOOS=wasip1 GOARCH=wasm go build -tags std -o example/std_http.wasm        ./example/http

@@ -70,7 +70,7 @@ func countVowelsJSONRoundtripMem() int32 {
 	return 0
 }
 
-//export count_vowels
+//go:wasmexport count_vowels
 func countVowels() int32 {
 	input := pdk.Input()
 
@@ -102,5 +102,3 @@ func countVowels() int32 {
 
 	return 0
 }
-
-func main() {}
