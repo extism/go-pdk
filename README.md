@@ -68,7 +68,7 @@ platform.
 Compile this with the command:
 
 ```bash
-tinygo build -o plugin.wasm -target wasi main.go
+tinygo build -o plugin.wasm -target wasip1 main.go
 ```
 
 We can now test `plugin.wasm` using the
@@ -79,7 +79,7 @@ extism call plugin.wasm greet --input "Benjamin" --wasi
 # => Hello, Benjamin!
 ```
 
-> **Note**: Currently `wasi` must be provided for all Go plug-ins even if they
+> **Note**: Currently `wasip1` must be provided for all Go plug-ins even if they
 > don't need system access, however this will eventually be optional.
 
 > **Note**: We also have a web-based, plug-in tester called the
@@ -356,11 +356,26 @@ python3 app.py
 
 ## Reactor modules
 
-Since TinyGo doesn't support
-[Reactor modules](https://dylibso.com/blog/wasi-command-reactor/) yet, If you
-want to use WASI inside your Reactor module functions (exported functions other
-than `main`), you'll need to import `wasi-reactor` module which makes sure libc
-and go runtime are properly initialized:
+Since TinyGo version 0.34.0, the compiler has native support for 
+[Reactor modules](https://dylibso.com/blog/wasi-command-reactor/).
+
+Make sure you invoke the compiler with the `-buildmode=c-shared` flag
+so that libc and the Go runtime are properly initialized:
+
+```bash
+cd example/reactor
+tinygo build -target wasip1 -buildmode=c-shared -o reactor.wasm ./tiny_main.go
+extism call ./reactor.wasm read_file --input "./test.txt" --allow-path . --wasi --log-level info
+# => Hello World!
+```
+
+### Note on TinyGo 0.33.0 and earlier
+
+TinyGo versions below 0.34.0 do not support
+[Reactor modules](https://dylibso.com/blog/wasi-command-reactor/).
+If you want to use WASI inside your Reactor module functions (exported functions other
+than `main`). You can however import the `wasi-reactor` module to ensure that libc
+and go runtime are initialized as expected:
 
 ```go
 package main
@@ -389,7 +404,7 @@ func main() {}
 ```
 
 ```bash
-tinygo build -target wasi -o reactor.wasm .\tiny_main.go
+tinygo build -target wasip1 -o reactor.wasm ./tiny_main.go
 extism call ./reactor.wasm read_file --input "./test.txt" --allow-path . --wasi --log-level info
 # => Hello World!
 ```
