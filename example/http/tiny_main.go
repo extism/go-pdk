@@ -7,7 +7,7 @@ import (
 	"github.com/extism/go-pdk"
 )
 
-//export http_get
+//go:wasmexport http_get
 func httpGet() int32 {
 	// create an HTTP Request (withuot relying on WASI), set headers as needed
 	req := pdk.NewHTTPRequest(pdk.MethodGet, "https://jsonplaceholder.typicode.com/todos/1")
@@ -21,4 +21,3 @@ func httpGet() int32 {
 
 	return 0
 }
-

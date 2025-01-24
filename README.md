@@ -32,28 +32,25 @@ import (
 	"github.com/extism/go-pdk"
 )
 
-//export greet
+//go:wasmexport greet
 func greet() int32 {
 	input := pdk.Input()
 	greeting := `Hello, ` + string(input) + `!`
 	pdk.OutputString(greeting)
 	return 0
 }
-
-func main() {}
 ```
 
 Some things to note about this code:
 
-1. The `//export greet` comment is required. This marks the greet function as an
+1. The `//go:wasmexport greet` comment is required. This marks the greet function as an
    export with the name `greet` that can be called by the host.
-2. We need a `main` but it is unused.
-3. Exports in the Go PDK are coded to the raw ABI. You get parameters from the
+2. Exports in the Go PDK are coded to the raw ABI. You get parameters from the
    host by calling
    [pdk.Input* functions](https://pkg.go.dev/github.com/extism/go-pdk#Input) and
    you send returns back with the
    [pdk.Output* functions](https://pkg.go.dev/github.com/extism/go-pdk#Output).
-4. An Extism export expects an i32 return code. `0` is success and `1` is a
+3. An Extism export expects an i32 return code. `0` is success and `1` is a
    failure.
 
 Install the `tinygo` compiler:
@@ -68,7 +65,7 @@ platform.
 Compile this with the command:
 
 ```bash
-tinygo build -o plugin.wasm -target wasi main.go
+tinygo build -o plugin.wasm -target wasip1 -buildmode=c-shared main.go
 ```
 
 We can now test `plugin.wasm` using the
@@ -79,7 +76,7 @@ extism call plugin.wasm greet --input "Benjamin" --wasi
 # => Hello, Benjamin!
 ```
 
-> **Note**: Currently `wasi` must be provided for all Go plug-ins even if they
+> **Note**: Currently `wasip1` must be provided for all Go plug-ins even if they
 > don't need system access, however this will eventually be optional.
 
 > **Note**: We also have a web-based, plug-in tester called the
@@ -92,7 +89,7 @@ use [pdk.SetError](https://pkg.go.dev/github.com/extism/go-pdk#SetError) or
 [pdk.SetErrorString](https://pkg.go.dev/github.com/extism/go-pdk#SetErrorString):
 
 ```go
-//export greet
+//go:wasmexport greet
 func greet() int32 {
 	name := string(pdk.Input())
 	if name == "Benjamin" {
@@ -110,6 +107,7 @@ Now when we try again:
 ```bash
 extism call plugin.wasm greet --input="Benjamin" --wasi
 # => Error: Sorry, we don't greet Benjamins!
+# => returned non-zero exit code: 1
 echo $? # print last status code
 # => 1
 extism call plugin.wasm greet --input="Zach" --wasi
@@ -134,7 +132,7 @@ type Sum struct {
 	Sum int `json:"sum"`
 }
 
-//export add
+//go:wasmexport add
 func add() int32 {
 	params := Add{}
 	// use json input helper, which automatically unmarshals the plugin input into your struct
@@ -145,7 +143,7 @@ func add() int32 {
 	}
 	sum := Sum{Sum: params.A + params.B}
 	// use json output helper, which automatically marshals your struct to the plugin output
-	output, err := pdk.OutputJSON(sum)
+	_, err := pdk.OutputJSON(sum)
 	if err != nil {
 		pdk.SetError(err)
 		return 1
@@ -167,7 +165,7 @@ that exists across every function call. Here is a trivial example using
 [pdk.GetConfig](https://pkg.go.dev/github.com/extism/go-pdk#GetConfig):
 
 ```go
-//export greet
+//go:wasmexport greet
 func greet() int32 {
 	user, ok := pdk.GetConfig("user")
 	if !ok {
@@ -195,7 +193,7 @@ will persist across function calls. These variables will persist as long as the
 host has loaded and not freed the plug-in.
 
 ```go
-//export count
+//go:wasmexport count
 func count() int32 {
 	count := pdk.GetVarInt("count")
 	count = count + 1
@@ -220,7 +218,7 @@ you to use the host application to log without having to give the plug-in
 permission to make syscalls.
 
 ```go
-//export log_stuff
+//go:wasmexport log_stuff
 func logStuff() int32 {
 	pdk.Log(pdk.LogInfo, "An info log!")
 	pdk.Log(pdk.LogDebug, "A debug log!")
@@ -252,7 +250,7 @@ Sometimes it is useful to let a plug-in
 [See this example](example/http/tiny_main.go)
 
 ```go
-//export http_get
+//go:wasmexport http_get
 func httpGet() int32 {
 	// create an HTTP Request (withuot relying on WASI), set headers as needed
 	req := pdk.NewHTTPRequest(pdk.MethodGet, "https://jsonplaceholder.typicode.com/todos/1")
@@ -304,7 +302,7 @@ We should be able to call this function as a normal Go function. Note that we
 need to manually handle the pointer casting:
 
 ```go
-//export hello_from_python
+//go:wasmexport hello_from_python
 func helloFromPython() int32 {
     msg := "An argument to send to Python"
     mem := pdk.AllocateString(msg)
@@ -356,11 +354,29 @@ python3 app.py
 
 ## Reactor modules
 
-Since TinyGo doesn't support
-[Reactor modules](https://dylibso.com/blog/wasi-command-reactor/) yet, If you
-want to use WASI inside your Reactor module functions (exported functions other
-than `main`), you'll need to import `wasi-reactor` module which makes sure libc
-and go runtime are properly initialized:
+Since TinyGo version 0.34.0, the compiler has native support for 
+[Reactor modules](https://dylibso.com/blog/wasi-command-reactor/).
+
+Make sure you invoke the compiler with the `-buildmode=c-shared` flag
+so that libc and the Go runtime are properly initialized:
+
+```bash
+cd example/reactor
+tinygo build -target wasip1 -buildmode=c-shared -o reactor.wasm ./tiny_main.go
+extism call ./reactor.wasm read_file --input "./test.txt" --allow-path . --wasi --log-level info
+# => Hello World!
+```
+
+### Note on TinyGo 0.33.0 and earlier
+
+TinyGo versions below 0.34.0 do not support
+[Reactor modules](https://dylibso.com/blog/wasi-command-reactor/).
+If you want to use WASI inside your Reactor module functions (exported functions other
+than `main`). You can however import the `wasi-reactor` module to ensure that libc
+and go runtime are initialized as expected:
+
+Moreover, older versions may not provide the special `//go:wasmexport` 
+directive, and instead use `//export`.
 
 ```go
 package main
@@ -389,7 +405,7 @@ func main() {}
 ```
 
 ```bash
-tinygo build -target wasi -o reactor.wasm .\tiny_main.go
+tinygo build -target wasip1 -o reactor.wasm ./tiny_main.go
 extism call ./reactor.wasm read_file --input "./test.txt" --allow-path . --wasi --log-level info
 # => Hello World!
 ```
