@@ -1,6 +1,8 @@
 //go:build std
 // +build std
 
+// Build the example, then invoke with:
+// GOOS=wasip1 GOARCH=wasm go build std_main.go
 // extism call --wasi --allow-host "jsonplaceholder.typicode.com" std_main _start
 
 package main
@@ -12,6 +14,7 @@ import (
 	"os"
 
 	pdk "github.com/extism/go-pdk"
+	pdkhttp "github.com/extism/go-pdk/http"
 )
 
 // Currently, the standard Go compiler cannot export custom functions and is limited to exporting
@@ -32,9 +35,9 @@ func httpGet() ([]byte, error) {
 	//
 	// Alternativly, if using http.Client, specify the transport:
 	//   client := http.Client{
-	//   	Transport: &pdk.HTTPTransport{},
+	//   	Transport: &pdkhttp.HTTPTransport{},
 	//   }
-	http.DefaultTransport = &pdk.HTTPTransport{}
+	http.DefaultTransport = &pdkhttp.HTTPTransport{}
 
 	resp, err := http.Get("https://jsonplaceholder.typicode.com/todos/1")
 	if err != nil {
