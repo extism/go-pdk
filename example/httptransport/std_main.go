@@ -33,7 +33,7 @@ func main() {
 func httpGet() ([]byte, error) {
 	// Set the default transport to use Extism PDK HTTPTransport
 	//
-	// Alternativly, if using http.Client, specify the transport:
+	// Alternatively, if using http.Client, specify the transport:
 	//   client := http.Client{
 	//   	Transport: &pdkhttp.HTTPTransport{},
 	//   }
