@@ -21,10 +21,6 @@ type HTTPTransport struct {
 func (t *HTTPTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 	convertRequestHeaders := func() map[string]string {
-		if len(req.Header) == 0 {
-			return nil
-		}
-
 		result := map[string]string{}
 
 		for name, values := range req.Header {
