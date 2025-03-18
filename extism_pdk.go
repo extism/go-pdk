@@ -356,7 +356,7 @@ func NewHTTPRequest(method HTTPMethod, url string) *HTTPRequest {
 	return &HTTPRequest{
 		meta: HTTPRequestMeta{
 			URL:     url,
-			Headers: nil,
+			Headers: map[string]string{},
 			Method:  method.String(),
 		},
 		body: nil,
