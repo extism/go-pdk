@@ -83,9 +83,9 @@ func extismLogWarn(offset memory.ExtismPointer)
 //go:wasmimport extism:host/env log_error
 func extismLogError(offset memory.ExtismPointer)
 
-// extismLogTrace logs an "error" string to the host from the previously-written UTF-8 string written to `offset`.
+// extismLogTrace logs a "trace" string to the host from the previously-written UTF-8 string written to `offset`.
 //
-//go:wasmimport extism:host/env log_error
+//go:wasmimport extism:host/env log_trace
 func extismLogTrace(offset memory.ExtismPointer)
 
 // extismGetLogLevel returns the configured log level
