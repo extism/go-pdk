@@ -17,4 +17,4 @@ runs:
     - uses: ./.extism-cli/.github/actions/extism-cli
     - name: Install
       shell: bash
-      run: sudo extism lib install --version git --github-token "${{ inputs.token }}"
+      run: sudo extism lib install --version v1.21.0 --github-token "${{ inputs.token }}"

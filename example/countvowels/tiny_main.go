@@ -15,7 +15,7 @@ type CountVowelsInput struct {
 }
 
 // CountVowelsOutput represents the JSON output sent to the host.
-type CountVowelsOuptut struct {
+type CountVowelsOutput struct {
 	Count  int    `json:"count"`
 	Total  int    `json:"total"`
 	Vowels string `json:"vowels"`
@@ -35,7 +35,7 @@ func countVowelsTyped() int32 {
 
 //go:wasmexport count_vowels_json_output
 func countVowelsJSONOutput() int32 {
-	output := CountVowelsOuptut{Count: 42, Total: 2.1e7, Vowels: "aAeEiIoOuUyY"}
+	output := CountVowelsOutput{Count: 42, Total: 2.1e7, Vowels: "aAeEiIoOuUyY"}
 	err := pdk.OutputJSON(output)
 	if err != nil {
 		pdk.SetError(err)
@@ -46,7 +46,7 @@ func countVowelsJSONOutput() int32 {
 
 //go:wasmexport count_vowels_roundtrip_json_mem
 func countVowelsJSONRoundtripMem() int32 {
-	a := CountVowelsOuptut{Count: 42, Total: 2.1e7, Vowels: "aAeEiIoOuUyY"}
+	a := CountVowelsOutput{Count: 42, Total: 2.1e7, Vowels: "aAeEiIoOuUyY"}
 	mem, err := pdk.AllocateJSON(&a)
 	if err != nil {
 		pdk.SetError(err)
@@ -54,7 +54,7 @@ func countVowelsJSONRoundtripMem() int32 {
 	}
 
 	// find the data in mem and ensure it's the same once decoded
-	var b CountVowelsOuptut
+	var b CountVowelsOutput
 	err = pdk.JSONFrom(mem.Offset(), &b)
 	if err != nil {
 		pdk.SetError(err)
@@ -79,7 +79,6 @@ func countVowels() int32 {
 		switch a {
 		case 'A', 'I', 'E', 'O', 'U', 'a', 'e', 'i', 'o', 'u':
 			count++
-		default:
 		}
 	}
 

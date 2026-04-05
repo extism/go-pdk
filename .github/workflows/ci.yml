@@ -17,13 +17,11 @@ jobs:
       - uses: ./go-pdk/.github/actions/libextism
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - run: cp go-pdk/go.sum . # Needed to get setup-go to work
-
       - name: Install Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          cache: true
-          go-version: '1.21.3'
+          go-version: '1.23.0'
+          cache-dependency-path: go-pdk/go.sum
 
       - name: Install TinyGo
         uses: acifani/setup-tinygo@v1.1.0
